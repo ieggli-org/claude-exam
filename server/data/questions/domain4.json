@@ -1,0 +1,452 @@
+[
+  {
+    "id": "d4-001",
+    "domain": 4,
+    "domainName": "Prompt Engineering & Structured Output",
+    "scenario": "Customer Support Resolution Agent",
+    "text": "Your code review agent flags 60% of pull requests as having 'potential security vulnerabilities,' but engineering teams have stopped acting on most alerts because so many are false positives. The instructions currently say 'be thorough and flag anything that could be a security concern.' What change will most effectively reduce false positives?",
+    "options": [
+      {"letter": "A", "text": "Add 'only report high-confidence findings' to the existing instructions so the model filters uncertain results"},
+      {"letter": "B", "text": "Add a post-processing step that randomly samples 50% of flags to reduce alert volume"},
+      {"letter": "C", "text": "Temporarily disable all security alerts until the model can be retrained on the team's codebase"},
+      {"letter": "D", "text": "Replace the vague instruction with explicit criteria: 'flag only when the claimed behavior directly contradicts the actual code logic'"}
+    ],
+    "correctAnswer": "D",
+    "explanation": "Explicit criteria that describe exactly what constitutes a valid finding are the most effective way to reduce false positives. 'Be thorough' is ambiguous — it tells the model to flag broadly. Concrete criteria like 'flag only when claimed behavior contradicts actual code' provide a precise decision boundary. 'Only report high-confidence findings' fails because model self-confidence is poorly calibrated; it doesn't improve precision."
+  },
+  {
+    "id": "d4-002",
+    "domain": 4,
+    "domainName": "Prompt Engineering & Structured Output",
+    "scenario": "Customer Support Resolution Agent",
+    "text": "Your security scanning agent has three detection categories: SQL injection (very high false positives), hardcoded secrets (low false positives), and insecure deserialization (moderate false positives). High false-positive rates on SQL injection are causing developers to distrust the accurate hardcoded secrets alerts. What should you do?",
+    "options": [
+      {"letter": "A", "text": "Lower the confidence threshold for all categories equally so the model is more conservative overall"},
+      {"letter": "B", "text": "Temporarily disable SQL injection detection while refining its criteria, to preserve trust in the accurate categories"},
+      {"letter": "C", "text": "Switch to a higher-parameter model that has better calibration across all security categories"},
+      {"letter": "D", "text": "Add a disclaimer to all alerts explaining that false positives are expected in automated security analysis"}
+    ],
+    "correctAnswer": "B",
+    "explanation": "High false-positive categories undermine developer trust even in accurate categories. The correct approach is to temporarily disable the high-FP category (SQL injection) while improving its prompts, rather than letting it erode confidence in reliable categories like hardcoded secrets. Lowering confidence thresholds for all categories makes other categories worse. Disclaimers reduce actionability without solving the problem."
+  },
+  {
+    "id": "d4-canonical-3",
+    "domain": 4,
+    "domainName": "Prompt Engineering & Structured Output",
+    "scenario": "Customer Support Resolution Agent",
+    "text": "Your agent achieves 55% first-contact resolution, well below the 80% target. Logs show it escalates straightforward cases (standard damage replacements with photo evidence) while attempting to autonomously handle complex situations requiring policy exceptions. What's the most effective way to improve escalation calibration?",
+    "options": [
+      {"letter": "A", "text": "Add explicit escalation criteria to your system prompt with few-shot examples demonstrating when to escalate versus resolve autonomously."},
+      {"letter": "B", "text": "Have the agent self-report a confidence score (1-10) before each response and automatically route requests to humans when confidence falls below a threshold."},
+      {"letter": "C", "text": "Deploy a separate classifier model trained on historical tickets to predict which requests need escalation before the main agent begins processing."},
+      {"letter": "D", "text": "Implement sentiment analysis to detect customer frustration levels and automatically escalate when negative sentiment exceeds a threshold."}
+    ],
+    "correctAnswer": "A",
+    "explanation": "Adding explicit escalation criteria with few-shot examples directly addresses the root cause: unclear decision boundaries. This is the proportionate first response before adding infrastructure. Option B fails because LLM self-reported confidence is poorly calibrated — the agent is already incorrectly confident on hard cases. Option C is over-engineered, requiring labeled data and ML infrastructure when prompt optimization hasn't been tried. Option D solves a different problem entirely — sentiment doesn't correlate with case complexity."
+  },
+  {
+    "id": "d4-004",
+    "domain": 4,
+    "domainName": "Prompt Engineering & Structured Output",
+    "scenario": "Customer Support Resolution Agent",
+    "text": "Your document analysis agent is instructed to 'extract all relevant financial figures' from reports. It sometimes includes non-critical footnote numbers and sometimes misses important revenue figures. What kind of criteria change most effectively calibrates extraction behavior?",
+    "options": [
+      {"letter": "A", "text": "Replace 'all relevant financial figures' with explicit criteria specifying which figure types to include and exclude"},
+      {"letter": "B", "text": "Add 'be selective and precise' to the existing instruction to improve calibration"},
+      {"letter": "C", "text": "Ask the model to include a relevance score for each extracted figure and discard low-scoring ones"},
+      {"letter": "D", "text": "Increase temperature to 0.0 to make extraction deterministic"}
+    ],
+    "correctAnswer": "A",
+    "explanation": "Vague terms like 'relevant' require the model to infer what you mean, leading to inconsistency. Explicit criteria — e.g., 'include revenue, operating income, and net income; exclude footnote reference numbers and page numbers' — remove ambiguity. 'Be selective and precise' is equally vague. Relevance scores add complexity without fixing the underlying ambiguity. Temperature affects randomness, not extraction accuracy."
+  },
+  {
+    "id": "d4-005",
+    "domain": 4,
+    "domainName": "Prompt Engineering & Structured Output",
+    "scenario": "Customer Support Resolution Agent",
+    "text": "You've written detailed instructions for a classification task but the agent still misclassifies edge cases at the boundary between two categories. Despite revising the instructions three times, performance on these boundary cases hasn't improved. What should you try next?",
+    "options": [
+      {"letter": "A", "text": "Accept that boundary cases cannot be reliably classified and route them all to manual review"},
+      {"letter": "B", "text": "Add more detailed prose descriptions of both categories to eliminate all remaining ambiguity"},
+      {"letter": "C", "text": "Add 2-4 few-shot examples specifically demonstrating the ambiguous boundary cases with reasoning for each classification decision"},
+      {"letter": "D", "text": "Increase the instruction length until the model has enough context to handle edge cases"}
+    ],
+    "correctAnswer": "C",
+    "explanation": "Few-shot examples are most effective for consistently formatted, actionable output when detailed instructions alone produce inconsistency. Boundary cases are precisely the scenario where showing WHY one classification was chosen over another is more effective than describing the categories further in prose. More prose description of the same concepts rarely helps when descriptions have already been revised multiple times."
+  },
+  {
+    "id": "d4-006",
+    "domain": 4,
+    "domainName": "Prompt Engineering & Structured Output",
+    "scenario": "Customer Support Resolution Agent",
+    "text": "You're building an agent that categorizes customer support tickets. You have 3 clear categories and a few ambiguous edge cases that always cause mistakes. How many few-shot examples should you include and what should they focus on?",
+    "options": [
+      {"letter": "A", "text": "Include 2-4 targeted examples focusing on the ambiguous scenarios, showing the reasoning for why each was categorized a particular way"},
+      {"letter": "B", "text": "Include 10+ examples covering all possible category combinations to ensure comprehensive coverage"},
+      {"letter": "C", "text": "Include 1 example per category showing a typical case, since examples should cover the common case not the edge case"},
+      {"letter": "D", "text": "Avoid few-shot examples and rely on detailed category descriptions to prevent the model from overfitting to example patterns"}
+    ],
+    "correctAnswer": "A",
+    "explanation": "The optimal few-shot prompting strategy is 2-4 targeted examples focusing on ambiguous scenarios where instructions alone fail, showing the reasoning behind each decision. Flooding the prompt with 10+ examples increases token cost without proportional benefit. Including only typical cases fails to address the known problem cases. Few-shot examples don't cause overfitting — they enable generalization to novel patterns."
+  },
+  {
+    "id": "d4-007",
+    "domain": 4,
+    "domainName": "Prompt Engineering & Structured Output",
+    "scenario": "Customer Support Resolution Agent",
+    "text": "You're extracting equipment measurements from maintenance logs that use varying formats: some use metric units, some imperial, some abbreviations, some spelled out. Instructions alone produce inconsistent extraction. What is the most effective solution?",
+    "options": [
+      {"letter": "A", "text": "Add comprehensive unit conversion tables to the system prompt so the model can convert all formats"},
+      {"letter": "B", "text": "Include few-shot examples showing extraction from logs with each format variation, demonstrating the expected normalized output"},
+      {"letter": "C", "text": "Pre-process the logs with a regex normalizer to standardize all units before passing them to the model"},
+      {"letter": "D", "text": "Ask the model to extract measurements with confidence scores and only use high-confidence extractions"}
+    ],
+    "correctAnswer": "B",
+    "explanation": "Few-shot examples are particularly effective for reducing hallucination in extraction tasks involving varied document structures and informal measurements. By showing the model examples of each format variation and the expected normalized output, you enable generalization to novel format patterns. Comprehensive unit tables add token overhead without addressing the core problem of format recognition."
+  },
+  {
+    "id": "d4-008",
+    "domain": 4,
+    "domainName": "Prompt Engineering & Structured Output",
+    "scenario": "Customer Support Resolution Agent",
+    "text": "A few-shot example in your prompting strategy shows the model choosing to escalate a request, but your examples only cover 3 escalation patterns. The model incorrectly handles a new 4th pattern not in the examples. What does this reveal about your few-shot strategy?",
+    "options": [
+      {"letter": "A", "text": "The examples should show reasoning (why escalate) not just outcomes, enabling the model to generalize to novel patterns"},
+      {"letter": "B", "text": "Few-shot examples can only handle pre-specified cases; you must add a 4th example for the new pattern"},
+      {"letter": "C", "text": "The model requires at least one example per expected pattern to handle it correctly"},
+      {"letter": "D", "text": "Few-shot prompting is unsuitable for escalation tasks; use a rule-based decision tree instead"}
+    ],
+    "correctAnswer": "A",
+    "explanation": "Effective few-shot examples enable generalization to novel patterns by including reasoning — showing WHY a particular action was chosen, not just the action itself. If examples only show outcomes without reasoning, the model can't generalize to new scenarios. Including reasoning allows the model to apply the same logic to the previously unseen 4th pattern."
+  },
+  {
+    "id": "d4-009",
+    "domain": 4,
+    "domainName": "Prompt Engineering & Structured Output",
+    "scenario": "Customer Support Resolution Agent",
+    "text": "You need to ensure that your Claude API calls return JSON that strictly conforms to your application's schema every time, without syntax errors. Which approach provides the strongest guarantee?",
+    "options": [
+      {"letter": "A", "text": "Instruct the model to 'always return valid JSON' and add a JSON validator that retries on parse failures"},
+      {"letter": "B", "text": "Use tool_use with a JSON schema definition — the model is constrained to produce schema-conformant output"},
+      {"letter": "C", "text": "Use temperature=0 to make outputs deterministic, which eliminates syntax variation"},
+      {"letter": "D", "text": "Use prompt engineering to describe the exact JSON structure and include a schema example in the prompt"}
+    ],
+    "correctAnswer": "B",
+    "explanation": "tool_use with JSON schemas is the most reliable approach for schema-compliant output — it eliminates syntax errors by constraining the model's output format at the API level. Instructing the model to 'return valid JSON' is advisory and relies on retry logic as a safety net. Temperature=0 affects randomness but not syntactic compliance. Prompt engineering with schema examples improves compliance but doesn't guarantee it."
+  },
+  {
+    "id": "d4-010",
+    "domain": 4,
+    "domainName": "Prompt Engineering & Structured Output",
+    "scenario": "Customer Support Resolution Agent",
+    "text": "You use tool_use with a strict JSON schema for document processing. Your schema includes a required 'contract_value' field. When processing documents where no contract value is mentioned, the model fabricates plausible-looking numbers. How should you fix this?",
+    "options": [
+      {"letter": "A", "text": "Make 'contract_value' nullable/optional in the schema so the model can return null when the information is absent"},
+      {"letter": "B", "text": "Add instruction 'never fabricate data' to the system prompt to prevent hallucination"},
+      {"letter": "C", "text": "Add a post-processing step that cross-references extracted values against source documents"},
+      {"letter": "D", "text": "Use a higher-temperature setting to increase output diversity and reduce repetitive fabrication patterns"}
+    ],
+    "correctAnswer": "A",
+    "explanation": "Making fields nullable/optional in the schema is the correct structural fix — it gives the model a valid way to express 'this information is not present' rather than forcing it to fabricate a value to satisfy a required field constraint. Prompt instructions against fabrication are advisory. Post-processing adds complexity but doesn't address the root cause. Temperature doesn't affect hallucination behavior."
+  },
+  {
+    "id": "d4-011",
+    "domain": 4,
+    "domainName": "Prompt Engineering & Structured Output",
+    "scenario": "Customer Support Resolution Agent",
+    "text": "You're classifying customer inquiries using tool_use. The classification schema has 5 defined categories but real-world inputs occasionally fall outside them. Users complain that edge cases are force-classified into the closest wrong category. What schema pattern addresses this?",
+    "options": [
+      {"letter": "A", "text": "Remove the enum constraint and allow free-text category values so the model can describe any category"},
+      {"letter": "B", "text": "Add a 'confidence' float field and route low-confidence classifications to manual review"},
+      {"letter": "C", "text": "Expand the enum to include all possible variations of the 5 categories plus common edge cases"},
+      {"letter": "D", "text": "Add an 'other' enum value paired with an optional 'category_detail' string field for descriptions of unlisted cases"}
+    ],
+    "correctAnswer": "D",
+    "explanation": "The enum + 'other' + detail string pattern handles extensible categories elegantly: the core enum provides structure for known cases, 'other' provides a valid escape hatch for unknowns, and the detail string captures what the unknown case actually is. Removing enum constraints loses the structured categorization benefit. Confidence scores are a different concern and don't prevent misclassification."
+  },
+  {
+    "id": "d4-012",
+    "domain": 4,
+    "domainName": "Prompt Engineering & Structured Output",
+    "scenario": "Customer Support Resolution Agent",
+    "text": "You have a tool_use call with tool_choice set to 'auto'. In some responses, the model returns a text explanation instead of calling the tool. You need the model to always use a tool. What should you change?",
+    "options": [
+      {"letter": "A", "text": "Change tool_choice to 'any' to require the model to call at least one tool"},
+      {"letter": "B", "text": "Change tool_choice to 'required' to mandate tool usage"},
+      {"letter": "C", "text": "Add 'you must always use a tool' to the system prompt alongside tool_choice: 'auto'"},
+      {"letter": "D", "text": "Remove tool_choice entirely — without it, the model defaults to always using tools"}
+    ],
+    "correctAnswer": "A",
+    "explanation": "tool_choice: 'any' requires the model to call at least one of the provided tools instead of returning a text response. tool_choice: 'auto' allows the model to decide whether to call a tool or respond with text, which is why it sometimes returns text. 'required' is not a valid tool_choice value. Prompt instructions alone are advisory and don't guarantee tool usage."
+  },
+  {
+    "id": "d4-013",
+    "domain": 4,
+    "domainName": "Prompt Engineering & Structured Output",
+    "scenario": "Customer Support Resolution Agent",
+    "text": "You're using tool_use to extract invoice data into a structured format. The schema validation passes consistently, but you notice extracted line-item totals don't sum to the reported invoice total in the document. What kind of error is this and how do you address it?",
+    "options": [
+      {"letter": "A", "text": "This is a schema error — add a custom validator to the JSON schema that enforces the sum constraint"},
+      {"letter": "B", "text": "This is a hallucination problem — switch to a larger model with better arithmetic capabilities"},
+      {"letter": "C", "text": "This is a syntax error — the schema isn't strict enough; add number format constraints to line item fields"},
+      {"letter": "D", "text": "This is a semantic error — strict JSON schemas prevent syntax errors but not semantic inconsistencies; add a 'calculated_total' field and validate it against 'stated_total' post-extraction"}
+    ],
+    "correctAnswer": "D",
+    "explanation": "Strict JSON schemas eliminate syntax errors but do not prevent semantic errors — values that are structurally valid but logically inconsistent. The solution is semantic validation: include both a 'calculated_total' (sum of line items) and 'stated_total' (from the document) field, then detect discrepancies programmatically. JSON schema validators cannot enforce cross-field arithmetic constraints."
+  },
+  {
+    "id": "d4-014",
+    "domain": 4,
+    "domainName": "Prompt Engineering & Structured Output",
+    "scenario": "Customer Support Resolution Agent",
+    "text": "Your validation pipeline rejects Claude's output with a specific error: 'required field phone_number missing.' You want to use retry logic to self-correct. How should you structure the retry prompt?",
+    "options": [
+      {"letter": "A", "text": "Append the specific validation error to the original prompt and ask Claude to regenerate with the error fixed"},
+      {"letter": "B", "text": "Send an identical prompt again, since the error may have been a transient generation issue"},
+      {"letter": "C", "text": "Ask Claude to reflect on its previous output and identify any missing fields before regenerating"},
+      {"letter": "D", "text": "Raise temperature on the retry to increase the chance of a different output that passes validation"}
+    ],
+    "correctAnswer": "A",
+    "explanation": "Retry-with-error-feedback — appending specific validation errors to the prompt — is the most effective self-correction strategy. Claude can directly see what went wrong and fix it. Sending the same prompt again provides no new information and produces the same error. Asking Claude to self-reflect without giving the specific error is less efficient. Raising temperature increases randomness but doesn't target the specific missing field."
+  },
+  {
+    "id": "d4-015",
+    "domain": 4,
+    "domainName": "Prompt Engineering & Structured Output",
+    "scenario": "Customer Support Resolution Agent",
+    "text": "Your invoice extraction pipeline has a retry loop that retries on any validation failure. For certain poorly-scanned invoices where the vendor name is completely illegible, the pipeline retries 5 times but never succeeds. What's the root cause and fix?",
+    "options": [
+      {"letter": "A", "text": "The retry prompt needs more specific feedback about what the vendor name field expects"},
+      {"letter": "B", "text": "Increase the maximum retries to 10 to give the model more chances to extract the information"},
+      {"letter": "C", "text": "The required information is absent from the source; retries cannot help — route these to human review instead"},
+      {"letter": "D", "text": "Lower temperature on retries to make the model more focused on finding the vendor name"}
+    ],
+    "correctAnswer": "C",
+    "explanation": "Retries are effective for format/structural errors where the information exists but was formatted incorrectly. They are ineffective when the required information is absent from the source — no amount of retrying can extract information that isn't there. Illegible vendor names should be detected and routed to human review rather than exhausting retry budget."
+  },
+  {
+    "id": "d4-016",
+    "domain": 4,
+    "domainName": "Prompt Engineering & Structured Output",
+    "scenario": "Customer Support Resolution Agent",
+    "text": "You want to systematically analyze which types of code constructs are triggering false-positive security findings. What field should you include in your structured output schema?",
+    "options": [
+      {"letter": "A", "text": "A 'false_positive_probability' float field so you can filter findings below a confidence threshold"},
+      {"letter": "B", "text": "A 'detected_pattern' field that captures which code construct triggered the finding, enabling systematic false-positive analysis"},
+      {"letter": "C", "text": "A 'category_rationale' text field explaining why the finding was categorized as it was"},
+      {"letter": "D", "text": "A 'similar_findings_count' integer field tracking how often the same issue has been flagged previously"}
+    ],
+    "correctAnswer": "B",
+    "explanation": "The 'detected_pattern' field captures which specific code construct triggered each finding. Aggregating this field across false-positive alerts enables systematic dismissal analysis — identifying patterns (e.g., 'string concatenation in logging statements' always false-positive for SQL injection) that can then be explicitly excluded from the detection criteria."
+  },
+  {
+    "id": "d4-017",
+    "domain": 4,
+    "domainName": "Prompt Engineering & Structured Output",
+    "scenario": "Customer Support Resolution Agent",
+    "text": "Your extraction system fails semantic validation on 15% of invoices where the stated total doesn't match the sum of extracted line items. You want to use this information in your retry logic. What approach most effectively targets this specific error?",
+    "options": [
+      {"letter": "A", "text": "Append the discrepancy ('stated_total: $1,240 but line items sum to $1,180') as specific feedback in the retry prompt"},
+      {"letter": "B", "text": "Retry with a generic instruction to 'double-check all numbers' without specifying which validation failed"},
+      {"letter": "C", "text": "Bypass validation for semantic errors and only retry on schema syntax errors"},
+      {"letter": "D", "text": "Add the invoice to a manual review queue and skip automated retry for semantic errors"}
+    ],
+    "correctAnswer": "A",
+    "explanation": "Providing specific discrepancy details in the retry prompt allows Claude to understand exactly what's inconsistent and re-examine those specific values. Generic instructions like 'double-check numbers' are vague and less effective. Semantic errors are worth retrying since the information exists in the document and Claude may have misread a digit; only absent information is irretrievable."
+  },
+  {
+    "id": "d4-018",
+    "domain": 4,
+    "domainName": "Prompt Engineering & Structured Output",
+    "scenario": "Claude Code for Continuous Integration",
+    "text": "Your data engineering team runs a weekly job that summarizes 10,000 database query logs and flags slow queries for optimization review. The job runs on Sunday nights and engineers review results Monday morning. Should you use the Message Batches API?",
+    "options": [
+      {"letter": "A", "text": "Yes — this is a latency-tolerant, overnight batch job where the 50% cost savings and 24-hour processing window are appropriate"},
+      {"letter": "B", "text": "No — the Message Batches API is for one-off requests, not high-volume repeated jobs"},
+      {"letter": "C", "text": "Yes, but only if you can guarantee the job completes within 1 hour using batch status polling"},
+      {"letter": "D", "text": "No — 10,000 requests exceeds the Message Batches API's per-job limit"}
+    ],
+    "correctAnswer": "A",
+    "explanation": "The Message Batches API is ideal for latency-tolerant workflows like overnight reports reviewed the next morning. The 50% cost savings are significant at 10,000 requests, and the 24-hour processing window is acceptable since results aren't needed until Monday. The API is designed for high-volume repeated jobs. There's no per-job limit preventing this use case."
+  },
+  {
+    "id": "d4-019",
+    "domain": 4,
+    "domainName": "Prompt Engineering & Structured Output",
+    "scenario": "Claude Code for Continuous Integration",
+    "text": "A developer wants to use the Message Batches API to generate test cases for every function in the codebase. She plans to collect the results, correlate them with the original function, and add them to the test suite. What field must her batch requests include to enable correct result correlation?",
+    "options": [
+      {"letter": "A", "text": "A metadata.function_name field in the request body to tag each result"},
+      {"letter": "B", "text": "A custom_id field in each batch request that uniquely identifies which function it corresponds to"},
+      {"letter": "C", "text": "Requests don't need correlation fields — the Batch API returns results in the same order as requests"},
+      {"letter": "D", "text": "A correlation_token in the system prompt that the model echoes back in its response"}
+    ],
+    "correctAnswer": "B",
+    "explanation": "The custom_id field is the Batch API's mechanism for correlating request/response pairs. Each request gets a unique custom_id (e.g., the function name or ID), and the response includes the same custom_id, allowing you to match results to their originating request. Batch results are not guaranteed to be returned in submission order."
+  },
+  {
+    "id": "d4-020",
+    "domain": 4,
+    "domainName": "Prompt Engineering & Structured Output",
+    "scenario": "Claude Code for Continuous Integration",
+    "text": "A product manager proposes using the Batch API for an automated code review that runs on every pull request and blocks merging until complete. An engineer objects. Who is correct and why?",
+    "options": [
+      {"letter": "A", "text": "The engineer is correct — blocking pre-merge checks require timely completion; Batch API has no guaranteed latency SLA and is inappropriate for blocking workflows"},
+      {"letter": "B", "text": "The PM is correct — Batch API reduces costs by 50%, and the savings justify implementing status polling to wait for completion"},
+      {"letter": "C", "text": "The engineer is correct — Batch API doesn't support code review tasks, only text summarization"},
+      {"letter": "D", "text": "The PM is correct — Batch API processing times are typically under 5 minutes, making it viable for pre-merge checks"}
+    ],
+    "correctAnswer": "A",
+    "explanation": "The Message Batches API has processing times up to 24 hours with no guaranteed latency SLA. Blocking pre-merge checks where developers wait for results require timely completion — a check that might take hours or days defeats its purpose. The cost savings don't justify blocking developer workflows. The appropriate use is for latency-tolerant workflows like overnight reports."
+  },
+  {
+    "id": "d4-021",
+    "domain": 4,
+    "domainName": "Prompt Engineering & Structured Output",
+    "scenario": "Claude Code for Continuous Integration",
+    "text": "You're designing a batch processing system that needs Claude to use a tool to look up information, process the result, then call a second tool based on the first result — all within a single batch request. What limitation must you account for?",
+    "options": [
+      {"letter": "A", "text": "The Batch API does not support multi-turn tool calling within a single request — each request is a single turn"},
+      {"letter": "B", "text": "The Batch API supports up to 3 tool calls per request but not more"},
+      {"letter": "C", "text": "The Batch API requires all tool calls to be specified upfront in the request's tool_use array"},
+      {"letter": "D", "text": "The Batch API supports multi-turn tool calling but only with synchronous tool execution"}
+    ],
+    "correctAnswer": "A",
+    "explanation": "The Message Batches API does not support multi-turn tool calling within a single request. Each batch request is processed as a single turn — if the model makes a tool call, there's no mechanism for providing tool results and continuing the conversation within the same batch request. Multi-turn agentic workflows with tool calling require the real-time API."
+  },
+  {
+    "id": "d4-022",
+    "domain": 4,
+    "domainName": "Prompt Engineering & Structured Output",
+    "scenario": "Claude Code for Continuous Integration",
+    "text": "Which of these four workflows is LEAST suitable for the Message Batches API?",
+    "options": [
+      {"letter": "A", "text": "A blocking pre-merge check that developers must wait for before merging their pull request"},
+      {"letter": "B", "text": "A nightly job that generates documentation for all functions modified that day"},
+      {"letter": "C", "text": "A weekly audit that categorizes all customer feedback from the past 7 days"},
+      {"letter": "D", "text": "An overnight job that generates test cases for functions lacking test coverage"}
+    ],
+    "correctAnswer": "A",
+    "explanation": "Blocking pre-merge checks are the least suitable use case for the Batch API because they require timely completion — developers are waiting. The Batch API has no guaranteed latency SLA and can take up to 24 hours. The other three options are all latency-tolerant batch workflows where the cost savings are appropriate and results are reviewed after the fact."
+  },
+  {
+    "id": "d4-023",
+    "domain": 4,
+    "domainName": "Prompt Engineering & Structured Output",
+    "scenario": "Claude Code for Continuous Integration",
+    "text": "You run a weekly technical debt report using the Batch API and notice that results arrive out of order compared to your submission sequence. How should your system handle this?",
+    "options": [
+      {"letter": "A", "text": "Use the custom_id field to correlate each response to its request — the Batch API does not guarantee ordering"},
+      {"letter": "B", "text": "Sort results by timestamp to restore submission order"},
+      {"letter": "C", "text": "This indicates an API error; batch results should always be returned in submission order"},
+      {"letter": "D", "text": "Include a sequence_number in the prompt and parse it from the model's response"}
+    ],
+    "correctAnswer": "A",
+    "explanation": "Batch API results are not guaranteed to be returned in submission order. The custom_id field is explicitly designed for this: you assign a unique identifier to each request, and the corresponding response includes that same identifier, enabling correct correlation regardless of result order. Sorting by timestamp is unreliable and sequence numbers parsed from prompts are fragile."
+  },
+  {
+    "id": "d4-024",
+    "domain": 4,
+    "domainName": "Prompt Engineering & Structured Output",
+    "scenario": "Claude Code for Continuous Integration",
+    "text": "Your team has run a code review on a 14-file pull request in the same session that generated the code. The reviewer notes: 'This is the same model that wrote the code — it's likely to repeat the same blind spots.' What is the principle being invoked?",
+    "options": [
+      {"letter": "A", "text": "Self-review limitation: a model that wrote code retains the generation reasoning context and is less likely to question its own decisions"},
+      {"letter": "B", "text": "Context contamination: the original code generation filled the context window, leaving less capacity for thorough review"},
+      {"letter": "C", "text": "Confirmation bias: larger models consistently confirm their own outputs rather than finding errors"},
+      {"letter": "D", "text": "Attention dilution: reviewing 14 files causes attention to spread too thin for quality review"}
+    ],
+    "correctAnswer": "A",
+    "explanation": "The self-review limitation captures why same-session review is less effective: the model that generated the code retains the reasoning and assumptions from generation, making it less likely to question decisions it already 'committed to.' An independent review instance — without prior context of the generation process — is more likely to catch bugs and question assumptions."
+  },
+  {
+    "id": "d4-025",
+    "domain": 4,
+    "domainName": "Prompt Engineering & Structured Output",
+    "scenario": "Claude Code for Continuous Integration",
+    "text": "You want to implement the most effective automated code review strategy. You're choosing between: (A) asking the same Claude session that wrote the code to review it, (B) starting a fresh Claude session with no prior context to review the code, or (C) asking the original session to self-review with explicit instructions to 'be critical and find all bugs.' Which is most effective?",
+    "options": [
+      {"letter": "A", "text": "Option B: an independent review instance without prior context is the most effective strategy"},
+      {"letter": "B", "text": "Option C: adding explicit 'be critical' instructions overcomes the self-review limitation"},
+      {"letter": "C", "text": "Option A: the session that wrote the code has deeper understanding and is therefore the best reviewer"},
+      {"letter": "D", "text": "All three are equally effective — review quality depends on the review prompt, not the session"}
+    ],
+    "correctAnswer": "A",
+    "explanation": "An independent review instance (fresh session without prior context) is more effective than self-review. The model reviewing code it didn't write approaches it without the generation assumptions and is more likely to question design decisions. Explicit 'be critical' instructions are advisory — they don't override the inherent self-review limitation. Understanding the generation context isn't an advantage for review; it's a liability."
+  },
+  {
+    "id": "d4-026",
+    "domain": 4,
+    "domainName": "Prompt Engineering & Structured Output",
+    "scenario": "Claude Code for Continuous Integration",
+    "text": "You've split a 14-file PR review into two passes: per-file local analysis and a separate cross-file integration pass. What does the cross-file integration pass specifically examine that per-file analysis cannot?",
+    "options": [
+      {"letter": "A", "text": "Cross-file data flow, interface compatibility, shared state mutations, and integration contract violations between modules"},
+      {"letter": "B", "text": "Syntax errors and type mismatches that span multiple files"},
+      {"letter": "C", "text": "Code style and naming convention consistency across the codebase"},
+      {"letter": "D", "text": "Missing test coverage for functions defined in one file but called from another"}
+    ],
+    "correctAnswer": "A",
+    "explanation": "The cross-file integration pass examines issues that require understanding relationships between files: data flow across module boundaries, interface compatibility (does the caller match the callee's contract?), shared state mutations, and integration patterns. Per-file local analysis is depth-first on individual files and cannot see these cross-cutting concerns. Syntax errors and style issues are typically caught in per-file analysis."
+  },
+  {
+    "id": "d4-027",
+    "domain": 4,
+    "domainName": "Prompt Engineering & Structured Output",
+    "scenario": "Claude Code for Continuous Integration",
+    "text": "Your automated review pipeline produces contradictory findings: file A's usage of a logging helper is flagged as 'potential injection risk' while the identical pattern in file B is marked 'safe.' What review architecture change would prevent this inconsistency?",
+    "options": [
+      {"letter": "A", "text": "Run a single all-files pass instead of per-file passes so the model sees all usages simultaneously"},
+      {"letter": "B", "text": "Switch to a rule-based linter for consistency, abandoning the AI review approach entirely"},
+      {"letter": "C", "text": "Apply per-file analysis with a consistent rule context and a cross-file pass to harmonize findings about shared patterns"},
+      {"letter": "D", "text": "Require the model to output a confidence score per finding and only surface findings above 0.9 confidence"}
+    ],
+    "correctAnswer": "C",
+    "explanation": "Inconsistent findings for identical patterns arise when each file is reviewed independently without awareness of how the same pattern was assessed elsewhere. A structured multi-pass approach — per-file local analysis with a consistent rule context, followed by a cross-file harmonization pass — ensures that shared patterns receive consistent treatment. A single all-files pass recreates the attention dilution problem that caused the inconsistency."
+  },
+  {
+    "id": "d4-canonical-11",
+    "domain": 4,
+    "domainName": "Prompt Engineering & Structured Output",
+    "scenario": "Claude Code for Continuous Integration",
+    "text": "Your team wants to reduce API costs for automated analysis. Currently, real-time Claude calls power two workflows: (1) a blocking pre-merge check that must complete before developers can merge, and (2) a technical debt report generated overnight for review the next morning. Your manager proposes switching both to the Message Batches API for its 50% cost savings. How should you evaluate this proposal?",
+    "options": [
+      {"letter": "A", "text": "Use batch processing for the technical debt reports only; keep real-time calls for pre-merge checks."},
+      {"letter": "B", "text": "Switch both workflows to batch processing with status polling to check for completion."},
+      {"letter": "C", "text": "Keep real-time calls for both workflows to avoid batch result ordering issues."},
+      {"letter": "D", "text": "Switch both to batch processing with a timeout fallback to real-time if batches take too long."}
+    ],
+    "correctAnswer": "A",
+    "explanation": "The Message Batches API offers 50% cost savings but has processing times up to 24 hours with no guaranteed latency SLA. This makes it unsuitable for blocking pre-merge checks where developers wait for results, but ideal for overnight batch jobs like technical debt reports. Option B is wrong because relying on batch completion isn't acceptable for blocking workflows. Option C reflects a misconception — batch results can be correlated using custom_id fields. Option D adds unnecessary complexity when the simpler solution is matching each API to its appropriate use case."
+  },
+  {
+    "id": "d4-canonical-12",
+    "domain": 4,
+    "domainName": "Prompt Engineering & Structured Output",
+    "scenario": "Claude Code for Continuous Integration",
+    "text": "A pull request modifies 14 files across the stock tracking module. Your single-pass review produces inconsistent results: detailed feedback for some files but superficial comments for others, obvious bugs missed, and contradictory feedback — flagging a pattern as problematic in one file while approving identical code elsewhere. How should you restructure the review?",
+    "options": [
+      {"letter": "A", "text": "Split into focused passes: analyze each file individually for local issues, then run a separate integration-focused pass examining cross-file data flow."},
+      {"letter": "B", "text": "Require developers to split large PRs into smaller submissions of 3-4 files before the automated review runs."},
+      {"letter": "C", "text": "Switch to a higher-tier model with a larger context window to give all 14 files adequate attention in one pass."},
+      {"letter": "D", "text": "Run three independent review passes on the full PR and only flag issues that appear in at least two of the three runs."}
+    ],
+    "correctAnswer": "A",
+    "explanation": "Splitting reviews into focused passes directly addresses attention dilution when processing many files at once. File-by-file analysis ensures consistent depth, while a separate integration pass catches cross-file issues. Option B shifts burden to developers without improving the system. Option C misunderstands that larger context windows don't solve attention quality issues. Option D would suppress detection of real bugs by requiring consensus on issues that may only be caught intermittently."
+  },
+  {
+    "id": "d4-030",
+    "domain": 4,
+    "domainName": "Prompt Engineering & Structured Output",
+    "scenario": "Claude Code for Continuous Integration",
+    "text": "You have a tool_use schema with a required 'severity' field that accepts 'low', 'medium', 'high', or 'critical'. The model sometimes returns 'MEDIUM' or 'Medium' instead of 'medium', failing downstream validation. What is the simplest fix?",
+    "options": [
+      {"letter": "A", "text": "Add 'always return lowercase enum values' to the system prompt"},
+      {"letter": "B", "text": "Add a retry that lowercases the returned value and re-validates"},
+      {"letter": "C", "text": "Change downstream validation to accept case-insensitive matches for all enum fields"},
+      {"letter": "D", "text": "Define 'severity' as an enum in the JSON schema with exact lowercase string values — the schema constraint enforces the format"}
+    ],
+    "correctAnswer": "D",
+    "explanation": "Defining the field as a JSON schema enum with exact values (['low', 'medium', 'high', 'critical']) is the most reliable fix — it constrains the model's output at the schema level. Prompt instructions are advisory. Retry logic and case-insensitive validation are workarounds that don't fix the root cause and add complexity. Schema-level constraints are the correct tool for format guarantees."
+  }
+]

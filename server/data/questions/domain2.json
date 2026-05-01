@@ -1,0 +1,385 @@
+[
+  {
+    "id": "d2-001",
+    "domain": 2,
+    "domainName": "Tool Design & MCP Integration",
+    "scenario": "Customer Support Resolution Agent",
+    "text": "Your agent has three tools: get_customer, lookup_order, and process_refund. All three have the description: 'Retrieves information.' During testing, the agent calls the wrong tool in 40% of cases. What is the most fundamental cause of this failure?",
+    "options": [
+      {"letter": "A", "text": "The agent's system prompt does not explicitly list the three tools and their order of priority."},
+      {"letter": "B", "text": "Tool descriptions are the primary mechanism LLMs use for tool selection; identical minimal descriptions give the model no basis to differentiate between the tools."},
+      {"letter": "C", "text": "The tools share similar parameter structures, causing the model to confuse their signatures."},
+      {"letter": "D", "text": "The model requires at least five tools before reliable selection is possible; three tools are too few."}
+    ],
+    "correctAnswer": "B",
+    "explanation": "Tool descriptions are the primary signal LLMs use to decide which tool to call. When all three descriptions are identical ('Retrieves information'), the model has no basis to distinguish them and essentially guesses. Fixing the descriptions — with input formats, example queries, and clear boundaries — is the correct first intervention."
+  },
+  {
+    "id": "d2-002",
+    "domain": 2,
+    "domainName": "Tool Design & MCP Integration",
+    "scenario": "Customer Support Resolution Agent",
+    "text": "Production logs show the agent frequently calls get_customer when users ask about orders (e.g., 'check my order #12345'), instead of calling lookup_order. Both tools have minimal descriptions ('Retrieves customer information' / 'Retrieves order details') and accept similar identifier formats. What's the most effective first step to improve tool selection reliability?",
+    "options": [
+      {"letter": "A", "text": "Add few-shot examples to the system prompt demonstrating correct tool selection patterns, with 5-8 examples showing order-related queries routing to lookup_order."},
+      {"letter": "B", "text": "Expand each tool's description to include input formats it handles, example queries, edge cases, and boundaries explaining when to use it versus similar tools."},
+      {"letter": "C", "text": "Implement a routing layer that parses user input before each turn and pre-selects the appropriate tool based on detected keywords and identifier patterns."},
+      {"letter": "D", "text": "Consolidate both tools into a single lookup_entity tool that accepts any identifier and internally determines which backend to query."}
+    ],
+    "correctAnswer": "B",
+    "explanation": "Tool descriptions are the primary mechanism LLMs use for tool selection. When descriptions are minimal, models lack the context to differentiate between similar tools. Option B directly addresses this root cause. Few-shot examples (A) add token overhead without fixing the underlying issue. A routing layer (C) is over-engineered and bypasses the LLM's natural language understanding. Consolidating tools (D) is valid but requires more effort than a first step warrants.",
+    "scenario": "Customer Support Resolution Agent"
+  },
+  {
+    "id": "d2-003",
+    "domain": 2,
+    "domainName": "Tool Design & MCP Integration",
+    "text": "A tool description reads: 'search_knowledge_base — searches the knowledge base.' An engineer reports the agent never uses this tool even when users ask questions that could be answered by it. What addition to the description would most improve selection reliability?",
+    "options": [
+      {"letter": "A", "text": "A longer list of synonyms for 'knowledge base,' such as 'documentation, wiki, help articles, FAQs.'"},
+      {"letter": "B", "text": "Example queries this tool handles (e.g., 'how do I reset my password?'), the input format it expects, edge cases like partial matches, and when to prefer it over web_search."},
+      {"letter": "C", "text": "A note that the tool is optional and should only be used when the model has high confidence the answer exists."},
+      {"letter": "D", "text": "The estimated latency of the tool so the model can decide whether calling it is worth the time."}
+    ],
+    "correctAnswer": "B",
+    "explanation": "An effective tool description should include: what type of queries the tool handles (with examples), the expected input format, edge case behaviors, and when to prefer this tool over alternatives. Synonyms (A) help keyword matching but don't clarify usage. Making the tool 'optional' (C) reduces selection likelihood. Latency (D) is not a selection criterion the model uses."
+  },
+  {
+    "id": "d2-004",
+    "domain": 2,
+    "domainName": "Tool Design & MCP Integration",
+    "text": "Two tools in a customer support agent — escalate_to_human and create_callback_request — have overlapping descriptions: both mention 'when customer needs human assistance.' The agent randomly picks between them. What is the correct fix?",
+    "options": [
+      {"letter": "A", "text": "Remove one of the tools to eliminate ambiguity."},
+      {"letter": "B", "text": "Rewrite both descriptions to clearly articulate distinct use cases: escalate_to_human for immediate live transfer, create_callback_request for scheduling a future callback."},
+      {"letter": "C", "text": "Add a priority ranking in the system prompt indicating which tool to prefer when both apply."},
+      {"letter": "D", "text": "Combine the two tools into a single human_handoff tool with a 'type' parameter."}
+    ],
+    "correctAnswer": "B",
+    "explanation": "Ambiguous overlapping descriptions cause misrouting. The correct fix is to make each tool's description precise and mutually exclusive in its use case. Describing the exact difference (live transfer vs. scheduled callback) gives the model the information it needs to choose correctly. Removing a tool (A) sacrifices functionality. Priority hints (C) are a workaround that doesn't fix the root cause."
+  },
+  {
+    "id": "d2-005",
+    "domain": 2,
+    "domainName": "Tool Design & MCP Integration",
+    "text": "A system prompt contains the sentence: 'Use the fetch_report tool to get the latest sales data.' An engineer notices the agent reliably calls fetch_report when the user mentions 'sales data' but never calls it for 'revenue numbers' or 'quarterly figures' even though they refer to the same data. What does this demonstrate about tool selection?",
+    "options": [
+      {"letter": "A", "text": "The model has a hard-coded preference for exact phrase matching in system prompts."},
+      {"letter": "B", "text": "Tool selection is sensitive to the specific wording used in system prompts and tool descriptions; semantic synonyms must be explicitly included to ensure reliable selection."},
+      {"letter": "C", "text": "The fetch_report tool's schema is incorrectly configured to only accept 'sales data' as a query."},
+      {"letter": "D", "text": "The model needs fine-tuning to recognize synonyms before it can handle varied phrasing."}
+    ],
+    "correctAnswer": "B",
+    "explanation": "Tool selection is keyword-sensitive — the model's likelihood of selecting a tool is influenced by how closely the user's phrasing matches the language in the system prompt and tool description. Including synonyms and variant phrasings (revenue, quarterly figures, sales data) in the description ensures the tool is selected regardless of how the user phrases the request."
+  },
+  {
+    "id": "d2-006",
+    "domain": 2,
+    "domainName": "Tool Design & MCP Integration",
+    "text": "A database query tool returns an HTTP 404 when the requested record does not exist. The agent's error handler formats this as an MCP error response with isError: true. An engineer argues this is incorrect — a 404 means 'no record found,' which is a valid query result, not an error. Who is correct and why?",
+    "options": [
+      {"letter": "A", "text": "The error handler is correct — any non-200 HTTP status should be surfaced as an MCP error."},
+      {"letter": "B", "text": "The engineer is correct — a successful query that returns no matching records should be represented as a valid empty result, not an error with isError: true."},
+      {"letter": "C", "text": "Both are correct — using isError: true with a 404 is a valid pattern that helps the model understand absence of data."},
+      {"letter": "D", "text": "The engineer is correct but only for queries that explicitly request potentially non-existent records; all other 404s should use isError: true."}
+    ],
+    "correctAnswer": "B",
+    "explanation": "A critical distinction in structured error responses is between access failures and valid empty results. A query that executes successfully but finds no matching records is a successful operation — the result just happens to be empty. Using isError: true for this case causes the agent to treat a normal condition as a failure and potentially retry or escalate unnecessarily. Reserve isError: true for genuine failures."
+  },
+  {
+    "id": "d2-007",
+    "domain": 2,
+    "domainName": "Tool Design & MCP Integration",
+    "text": "A tool returns the same error message for all failure types: 'Operation failed. Please try again.' An agent running in a loop retries 10 times on a business logic violation (attempting to cancel an already-completed order) and eventually crashes. What error response design would have prevented this?",
+    "options": [
+      {"letter": "A", "text": "Increasing the retry limit to 20 attempts before raising an exception."},
+      {"letter": "B", "text": "Returning a structured error with errorCategory: 'business_rule_violation' and isRetryable: false, so the agent knows not to retry."},
+      {"letter": "C", "text": "Returning a 500 status code to indicate a server-side failure that warrants retry."},
+      {"letter": "D", "text": "Logging the error server-side and returning success to prevent the agent from entering a retry loop."}
+    ],
+    "correctAnswer": "B",
+    "explanation": "Business rule violations are not retryable — repeating the same call will always fail. Returning a structured error with an explicit isRetryable: false flag and an appropriate error category (business_rule_violation) tells the agent it should not retry but instead handle the violation (e.g., inform the user, escalate). Generic errors (A, C) provide no signal for this decision. Returning false success (D) hides the problem."
+  },
+  {
+    "id": "d2-008",
+    "domain": 2,
+    "domainName": "Tool Design & MCP Integration",
+    "text": "A payment gateway tool times out intermittently under high load. The MCP error response for this scenario should have which configuration?",
+    "options": [
+      {"letter": "A", "text": "isError: true, errorCategory: 'transient', isRetryable: true — so the agent knows it can retry with exponential backoff."},
+      {"letter": "B", "text": "isError: true, errorCategory: 'business', isRetryable: false — to prevent duplicate payment attempts."},
+      {"letter": "C", "text": "isError: false — timeouts should be represented as empty results to avoid triggering error handling."},
+      {"letter": "D", "text": "isError: true, errorCategory: 'validation' — because the request did not complete successfully."}
+    ],
+    "correctAnswer": "A",
+    "explanation": "Transient errors (timeouts, temporary service unavailability) are retryable — the operation may succeed if attempted again after a delay. Marking them as transient with isRetryable: true allows the agent to apply exponential backoff and retry appropriately. Business errors (B) are for policy violations that will never succeed regardless of how many retries are attempted."
+  },
+  {
+    "id": "d2-009",
+    "domain": 2,
+    "domainName": "Tool Design & MCP Integration",
+    "text": "An agent calls a tool to fetch a user's profile. The tool returns: { isError: true, errorCategory: 'permission', message: 'User does not have access to this profile', isRetryable: false }. What should the agent do?",
+    "options": [
+      {"letter": "A", "text": "Retry the call with modified parameters to work around the permission check."},
+      {"letter": "B", "text": "Treat the error as a transient failure and retry with exponential backoff."},
+      {"letter": "C", "text": "Recognize this as a non-retryable permission error and handle it by informing the user or escalating appropriately."},
+      {"letter": "D", "text": "Return the raw error JSON to the user so they can diagnose the issue themselves."}
+    ],
+    "correctAnswer": "C",
+    "explanation": "A permission error with isRetryable: false is a definitive failure — retrying the same call will not succeed, and attempting to bypass the permission check (A) would be a security violation. The correct response is to recognize the error category, stop retrying, and handle it gracefully by informing the user what access is restricted or escalating to someone who has the required permission."
+  },
+  {
+    "id": "d2-010",
+    "domain": 2,
+    "domainName": "Tool Design & MCP Integration",
+    "text": "What is the primary purpose of the isRetryable boolean field in an MCP structured error response?",
+    "options": [
+      {"letter": "A", "text": "To indicate whether the tool supports idempotent retries without side effects."},
+      {"letter": "B", "text": "To communicate to the calling agent whether attempting the same operation again is likely to succeed, enabling appropriate retry or escalation decisions."},
+      {"letter": "C", "text": "To configure the maximum number of retries the tool will accept before permanently blocking the caller."},
+      {"letter": "D", "text": "To specify whether the error should be logged at the INFO or ERROR level in the agent's audit trail."}
+    ],
+    "correctAnswer": "B",
+    "explanation": "The isRetryable flag is a signal for the calling agent's decision logic: if true, retry with backoff (likely a transient issue); if false, do not retry (the error is deterministic and repeating will not help). This allows agents to handle different error categories appropriately rather than applying a one-size-fits-all retry policy or giving up on all errors."
+  },
+  {
+    "id": "d2-011",
+    "domain": 2,
+    "domainName": "Tool Design & MCP Integration",
+    "text": "An agent is given 18 tools covering every possible action in a CRM system, even though most interactions only require 3-5 of them. Users report the agent frequently takes wrong actions. What is the most likely cause?",
+    "options": [
+      {"letter": "A", "text": "The agent's context window is exceeded by the tool schema definitions, causing truncation."},
+      {"letter": "B", "text": "Having too many tools degrades selection reliability — the model must distinguish among 18 options and is more likely to select a semantically similar but incorrect tool."},
+      {"letter": "C", "text": "The CRM system's API rate limits are being exceeded because the agent calls too many different tools per session."},
+      {"letter": "D", "text": "The model's attention mechanism cannot process more than 10 tool schemas simultaneously."}
+    ],
+    "correctAnswer": "B",
+    "explanation": "Providing too many tools degrades tool selection reliability. When an agent has 18 tools, many of which are semantically similar (update_account, modify_account, patch_account_record), the model's likelihood of selecting the correct one decreases. Scoping tool access to only the 4-5 tools relevant to an agent's role dramatically improves selection accuracy."
+  },
+  {
+    "id": "d2-012",
+    "domain": 2,
+    "domainName": "Tool Design & MCP Integration",
+    "text": "A multi-agent system has a data entry agent and a reporting agent. The data entry agent has been given access to both read-only reporting tools and write tools. A bug causes the data entry agent to delete records it was only supposed to read. What architectural principle would have prevented this?",
+    "options": [
+      {"letter": "A", "text": "The data entry agent should have been given a larger context window to better understand which tools to use."},
+      {"letter": "B", "text": "Agents should be given only the tools scoped to their role — the data entry agent should have only write tools; the reporting agent should have only read tools."},
+      {"letter": "C", "text": "All agents in a multi-agent system should share the same tool set to simplify coordination."},
+      {"letter": "D", "text": "Tool access should be determined dynamically at runtime based on the agent's current task, not configured at startup."}
+    ],
+    "correctAnswer": "B",
+    "explanation": "Scoped tool access (principle of least privilege) ensures each agent only has the tools it needs for its specific role. Giving a data entry agent read-only reporting tools creates both confusion (which tool should I use to look up this record?) and risk (accidental or unexpected use of an out-of-scope tool). Role-scoped toolsets reduce both selection errors and the blast radius of failures."
+  },
+  {
+    "id": "d2-013",
+    "domain": 2,
+    "domainName": "Tool Design & MCP Integration",
+    "text": "An agent is configured with tool_choice: 'auto'. After receiving a user message, it responds with a conversational reply ('I'd be happy to help with that!') instead of calling any tool. When would setting tool_choice: 'any' change this behavior?",
+    "options": [
+      {"letter": "A", "text": "tool_choice: 'any' has no effect; it is identical to 'auto' in all configurations."},
+      {"letter": "B", "text": "tool_choice: 'any' guarantees the model will call at least one of the available tools rather than returning a purely conversational text response."},
+      {"letter": "C", "text": "tool_choice: 'any' forces the model to call every available tool in sequence."},
+      {"letter": "D", "text": "tool_choice: 'any' only applies when the model has been given exactly one tool; it has no effect with multiple tools."}
+    ],
+    "correctAnswer": "B",
+    "explanation": "tool_choice: 'auto' allows the model to decide whether to call a tool or return text — it may choose text if it judges that sufficient. tool_choice: 'any' guarantees the model will invoke at least one tool from the available set rather than returning a purely conversational response. This is useful in agentic contexts where the next step always requires a tool call."
+  },
+  {
+    "id": "d2-014",
+    "domain": 2,
+    "domainName": "Tool Design & MCP Integration",
+    "text": "An engineer needs to ensure the agent always calls the validate_input tool as the first step, regardless of user input. Which tool_choice configuration enforces this?",
+    "options": [
+      {"letter": "A", "text": "tool_choice: 'auto' — the model will infer validate_input is needed from the system prompt."},
+      {"letter": "B", "text": "tool_choice: 'any' — the model will choose validate_input since it is the most relevant tool."},
+      {"letter": "C", "text": "tool_choice: { type: 'tool', name: 'validate_input' } — forces the model to call exactly this tool."},
+      {"letter": "D", "text": "tool_choice: 'required' — forces tool use and the model will always select validate_input first."}
+    ],
+    "correctAnswer": "C",
+    "explanation": "Forced tool_choice with { type: 'tool', name: 'validate_input' } guarantees the model calls exactly the specified tool. 'auto' is probabilistic. 'any' guarantees a tool call but allows the model to pick which one — it may not choose validate_input. There is no 'required' mode that both forces tool use and selects a specific tool."
+  },
+  {
+    "id": "d2-015",
+    "domain": 2,
+    "domainName": "Tool Design & MCP Integration",
+    "text": "An agentic pipeline step must always produce a structured action — never a conversational reply — because downstream processing expects a tool call result. Which tool_choice setting is most appropriate?",
+    "options": [
+      {"letter": "A", "text": "tool_choice: 'auto', because the model will naturally call a tool when tools are the right response."},
+      {"letter": "B", "text": "tool_choice: 'any', because it guarantees the model calls at least one tool rather than returning text."},
+      {"letter": "C", "text": "tool_choice: 'none', because no tool calls are needed when downstream processing handles the structured output."},
+      {"letter": "D", "text": "tool_choice: 'auto' with a system prompt instructing the model to always use a tool."}
+    ],
+    "correctAnswer": "B",
+    "explanation": "tool_choice: 'any' provides the guarantee needed: the model must call a tool rather than return text. This is appropriate when the pipeline architecture requires a tool invocation at this step. 'auto' allows text responses, which would break downstream processing. 'none' disables all tool calls. A system prompt instruction (D) is probabilistic, not deterministic."
+  },
+  {
+    "id": "d2-016",
+    "domain": 2,
+    "domainName": "Tool Design & MCP Integration",
+    "text": "Where should MCP server configuration be stored to make it available to all developers on a team and version-controlled alongside the project?",
+    "options": [
+      {"letter": "A", "text": "~/.claude.json in each developer's home directory."},
+      {"letter": "B", "text": ".mcp.json in the project root directory, committed to version control."},
+      {"letter": "C", "text": "In an environment variable MCP_CONFIG_PATH pointing to a shared network drive."},
+      {"letter": "D", "text": "In the system-level /etc/claude/mcp.json file on each developer's machine."}
+    ],
+    "correctAnswer": "B",
+    "explanation": "Project-level MCP configuration belongs in .mcp.json at the project root, committed to version control. This makes the configuration available to all team members who check out the repository and ensures configuration changes are tracked alongside code changes. ~/.claude.json is appropriate for personal or experimental MCP servers that are not shared with the team."
+  },
+  {
+    "id": "d2-017",
+    "domain": 2,
+    "domainName": "Tool Design & MCP Integration",
+    "text": "A developer wants to test a new experimental MCP server locally without affecting other team members' configurations. Where should this MCP server be configured?",
+    "options": [
+      {"letter": "A", "text": "In .mcp.json at the project root, so it is easily discoverable by other developers."},
+      {"letter": "B", "text": "In ~/.claude.json (user-level configuration), keeping it personal and separate from the team's project configuration."},
+      {"letter": "C", "text": "In a separate .mcp.experimental.json file in the project root."},
+      {"letter": "D", "text": "As an environment variable EXPERIMENTAL_MCP_SERVER_URL, which Claude automatically detects."}
+    ],
+    "correctAnswer": "B",
+    "explanation": "User-level MCP configuration in ~/.claude.json is the correct location for personal or experimental servers. It is not shared with the team (not in version control) and does not affect other developers' environments. Project-level .mcp.json is for shared tooling the whole team uses."
+  },
+  {
+    "id": "d2-018",
+    "domain": 2,
+    "domainName": "Tool Design & MCP Integration",
+    "text": "A .mcp.json file contains the entry: { \"env\": { \"API_KEY\": \"${GITHUB_TOKEN}\" } }. What does this configuration accomplish?",
+    "options": [
+      {"letter": "A", "text": "It hardcodes the string '${GITHUB_TOKEN}' as the API key value."},
+      {"letter": "B", "text": "It expands the GITHUB_TOKEN environment variable at runtime and passes its value as the API_KEY, keeping credentials out of version control."},
+      {"letter": "C", "text": "It causes an error because environment variable syntax is not supported in .mcp.json files."},
+      {"letter": "D", "text": "It instructs Claude to prompt the user to enter their GitHub token when the MCP server starts."}
+    ],
+    "correctAnswer": "B",
+    "explanation": "The ${VARIABLE_NAME} syntax in .mcp.json enables environment variable expansion at runtime. This is the recommended pattern for handling credentials: the .mcp.json file can be safely committed to version control (it contains no actual secrets), while each developer provides their own credentials via environment variables. The actual token value is never stored in the project files."
+  },
+  {
+    "id": "d2-019",
+    "domain": 2,
+    "domainName": "Tool Design & MCP Integration",
+    "text": "An MCP server for a project management system exposes both tools (create_issue, update_issue) and resources (project_hierarchy, open_issue_summaries). What is the primary benefit of exposing resources?",
+    "options": [
+      {"letter": "A", "text": "Resources allow the agent to modify server-side data without using tool calls."},
+      {"letter": "B", "text": "Resources expose content catalogs (like issue summaries or documentation hierarchies) that the agent can browse to reduce exploratory tool calls needed to understand available data."},
+      {"letter": "C", "text": "Resources are processed faster than tool calls because they bypass the model's reasoning step."},
+      {"letter": "D", "text": "Resources enable the MCP server to push updates to the agent without waiting for a tool call."}
+    ],
+    "correctAnswer": "B",
+    "explanation": "MCP resources expose structured content catalogs — summaries, hierarchies, indexes — that help the agent understand what data is available without making multiple exploratory tool calls. For example, an open_issue_summaries resource lets the agent scan all open issues in one step, rather than making individual lookup_issue calls until it finds what it needs."
+  },
+  {
+    "id": "d2-020",
+    "domain": 2,
+    "domainName": "Tool Design & MCP Integration",
+    "text": "When a Claude agent connects to an MCP server, how and when does it discover the available tools?",
+    "options": [
+      {"letter": "A", "text": "The agent discovers tools lazily — only when it attempts to call a tool for the first time does it query the server for its schema."},
+      {"letter": "B", "text": "All tools from the connected MCP server are discovered at connection time and become available simultaneously for the duration of the session."},
+      {"letter": "C", "text": "The agent must explicitly call a list_tools endpoint on each MCP server before any tools are available."},
+      {"letter": "D", "text": "Tools are discovered incrementally as the conversation progresses, with new tools revealed based on conversational context."}
+    ],
+    "correctAnswer": "B",
+    "explanation": "Upon connection to an MCP server, all of its configured tools are discovered and made available simultaneously. The agent has the full tool catalog available from the start of the session, not incrementally or lazily. This is why careful tool curation and scoped access matter — all discovered tools compete for selection from the first turn."
+  },
+  {
+    "id": "d2-021",
+    "domain": 2,
+    "domainName": "Tool Design & MCP Integration",
+    "text": "An agent needs to find all files in a TypeScript project that import a specific utility function called 'formatCurrency'. Which built-in tool is most appropriate for this task?",
+    "options": [
+      {"letter": "A", "text": "Glob — to find all .ts files and then inspect them."},
+      {"letter": "B", "text": "Grep — to search file contents for the pattern 'formatCurrency' across the codebase."},
+      {"letter": "C", "text": "Read — to open each file individually and check for the import statement."},
+      {"letter": "D", "text": "Edit — to search for and replace the function name across all files simultaneously."}
+    ],
+    "correctAnswer": "B",
+    "explanation": "Grep is designed for searching file contents for patterns — finding function names, import statements, error messages, etc. It efficiently scans across many files and returns matches with context. Glob finds files by path pattern (not content). Read requires knowing the file path in advance and iterating manually. Edit is for modifications, not search."
+  },
+  {
+    "id": "d2-022",
+    "domain": 2,
+    "domainName": "Tool Design & MCP Integration",
+    "text": "An agent needs to locate all test files in a React project, which follow the naming convention *.test.tsx. Which tool and pattern accomplishes this efficiently?",
+    "options": [
+      {"letter": "A", "text": "Grep with pattern 'describe(' to find files containing test blocks."},
+      {"letter": "B", "text": "Glob with pattern **/*.test.tsx to find all files matching the naming convention."},
+      {"letter": "C", "text": "Read on the project root directory to list all files."},
+      {"letter": "D", "text": "Edit with a search pattern of .test.tsx to identify test files."}
+    ],
+    "correctAnswer": "B",
+    "explanation": "Glob is the tool for finding files by path pattern. The **/*.test.tsx pattern recursively matches all files ending in .test.tsx anywhere in the directory tree. Grep searches file contents, not paths. Read cannot list directory contents. Edit is for making changes, not for file discovery."
+  },
+  {
+    "id": "d2-023",
+    "domain": 2,
+    "domainName": "Tool Design & MCP Integration",
+    "text": "An agent uses Edit to replace a variable name that appears 47 times across a large file. The Edit call fails with 'non-unique match.' What is the correct fallback approach?",
+    "options": [
+      {"letter": "A", "text": "Use Grep to identify all occurrences and then use Edit with a larger surrounding context block for each one."},
+      {"letter": "B", "text": "Use Read to get the full file content, perform the replacement programmatically, and then use Write to overwrite the file."},
+      {"letter": "C", "text": "Use Edit with the replace_all parameter set to true to replace all occurrences simultaneously."},
+      {"letter": "D", "text": "Use the Bash tool with sed to perform a global find-and-replace on the file."}
+    ],
+    "correctAnswer": "C",
+    "explanation": "Edit supports a replace_all parameter designed exactly for this case — replacing all occurrences of a string across a file. When a single targeted replacement fails because the match is not unique, replace_all is the correct tool-native solution. Read + Write is a valid fallback but replace_all is more precise and only changes the intended string."
+  },
+  {
+    "id": "d2-024",
+    "domain": 2,
+    "domainName": "Tool Design & MCP Integration",
+    "text": "An agent is building understanding of an unfamiliar codebase. What is the most efficient tool-use strategy to trace the application's execution flow from entry point to a specific module?",
+    "options": [
+      {"letter": "A", "text": "Read every file in the repository sequentially until the relevant code is found."},
+      {"letter": "B", "text": "Use Grep to find the main entry point, then Read the entry file to identify imports, then Grep for each import to trace the call chain incrementally."},
+      {"letter": "C", "text": "Use Glob to list all files, then Read each one in parallel to build a complete picture before starting analysis."},
+      {"letter": "D", "text": "Use Edit to insert console.log statements at potential entry points and observe which ones execute."}
+    ],
+    "correctAnswer": "B",
+    "explanation": "Building codebase understanding incrementally is the efficient approach: Grep to find entry points, Read to trace imports and call chains, Grep again to follow each import deeper. This targeted exploration follows the actual execution path without reading irrelevant files. Reading everything sequentially (A) or in bulk (C) wastes tokens on files that may be irrelevant."
+  },
+  {
+    "id": "d2-025",
+    "domain": 2,
+    "domainName": "Tool Design & MCP Integration",
+    "scenario": "Multi-Agent Research System",
+    "text": "During testing, you observe that the synthesis agent frequently needs to verify specific claims while combining findings. Currently, verification requires 2-3 round trips through the coordinator to the web search agent, increasing latency by 40%. Evaluation shows 85% of verifications are simple fact-checks while 15% require deeper investigation. What's the most effective approach?",
+    "options": [
+      {"letter": "A", "text": "Give the synthesis agent a scoped verify_fact tool for simple lookups, while complex verifications continue delegating to the web search agent through the coordinator."},
+      {"letter": "B", "text": "Have the synthesis agent accumulate all verification needs and return them as a batch to the coordinator at the end of its pass, which then sends them all to the web search agent at once."},
+      {"letter": "C", "text": "Give the synthesis agent access to all web search tools so it can handle any verification need directly without round-trips through the coordinator."},
+      {"letter": "D", "text": "Have the web search agent proactively cache extra context around each source during initial research, anticipating what the synthesis agent might need to verify."}
+    ],
+    "correctAnswer": "A",
+    "explanation": "Option A applies the principle of least privilege — the synthesis agent gets only what it needs for the 85% common case (simple fact verification) while preserving the existing coordination pattern for complex cases. Option B's batching creates blocking dependencies since synthesis steps may depend on earlier verified facts. Option C over-provisions the synthesis agent, violating separation of concerns. Option D relies on speculative caching that cannot reliably predict what the synthesis agent will need.",
+    "scenario": "Multi-Agent Research System"
+  },
+  {
+    "id": "d2-026",
+    "domain": 2,
+    "domainName": "Tool Design & MCP Integration",
+    "text": "An agent's tool description for send_notification reads: 'Sends a notification.' In production, the agent sends email notifications when the user intended SMS, and sends SMS when the user intended a push notification. What additional information in the description would most directly fix these errors?",
+    "options": [
+      {"letter": "A", "text": "The maximum character limit for each notification type."},
+      {"letter": "B", "text": "The exact parameter values that map to each notification channel (e.g., channel: 'email' | 'sms' | 'push'), along with examples of when each is appropriate."},
+      {"letter": "C", "text": "The estimated delivery latency for each notification type."},
+      {"letter": "D", "text": "A warning that incorrect channel selection may result in user complaints."}
+    ],
+    "correctAnswer": "B",
+    "explanation": "The model is not correctly mapping user intent to the channel parameter because the description provides no guidance on which parameter values correspond to which notification types or when to use each. Explicitly documenting the parameter enum values and providing examples of appropriate use cases ('use channel: sms when user requests text message') directly addresses the selection errors."
+  },
+  {
+    "id": "d2-027",
+    "domain": 2,
+    "domainName": "Tool Design & MCP Integration",
+    "text": "A validation error from a tool reads: { isError: true, errorCategory: 'validation', message: 'Invalid date format', isRetryable: true, hint: 'Use ISO 8601 format: YYYY-MM-DD' }. What is the optimal agent response to this error?",
+    "options": [
+      {"letter": "A", "text": "Log the error, increment the failure counter, and propagate the error to the user."},
+      {"letter": "B", "text": "Retry the tool call immediately with the same parameters since isRetryable is true."},
+      {"letter": "C", "text": "Use the hint to correct the date format and retry the call with the corrected parameter."},
+      {"letter": "D", "text": "Escalate to a human operator since validation errors indicate data corruption."}
+    ],
+    "correctAnswer": "C",
+    "explanation": "A validation error with isRetryable: true and a concrete hint is an invitation to self-correct. The agent should extract the hint ('use ISO 8601 format'), reformat the date parameter accordingly, and retry. Retrying with the same parameters (B) will produce the same validation error. Escalating (D) wastes human attention on a problem the agent can solve autonomously."
+  }
+]

@@ -1,0 +1,581 @@
+[
+  {
+    "id": "d1-001",
+    "domain": 1,
+    "domainName": "Agentic Architecture & Orchestration",
+    "scenario": "Customer Support Resolution Agent",
+    "text": "Your support agent calls tools in a loop. After issuing a tool call, what does the stop_reason value 'tool_use' in the API response indicate the agent should do?",
+    "options": [
+      {"letter": "A", "text": "Terminate the loop because the model has finished its reasoning."},
+      {"letter": "B", "text": "Continue the loop by executing the tool and appending the result to conversation history."},
+      {"letter": "C", "text": "Restart the loop from scratch, discarding any previous tool results."},
+      {"letter": "D", "text": "Pause execution and wait for human approval before proceeding."}
+    ],
+    "correctAnswer": "B",
+    "explanation": "A stop_reason of 'tool_use' means the model has requested one or more tool calls and expects the agent to execute them, append the results to conversation history, and continue the loop. The loop only terminates when stop_reason is 'end_turn' (or a similar final state), signaling the model has produced its final answer."
+  },
+  {
+    "id": "d1-002",
+    "domain": 1,
+    "domainName": "Agentic Architecture & Orchestration",
+    "text": "An agentic loop implementation logs the model's final text response and checks whether it contains phrases like 'task complete' or 'I have finished' to decide whether to stop. What is the primary risk of this approach?",
+    "options": [
+      {"letter": "A", "text": "It is computationally expensive to scan text on every iteration."},
+      {"letter": "B", "text": "The model may phrase completion differently, causing the loop to continue unnecessarily or exit prematurely."},
+      {"letter": "C", "text": "It requires storing the full conversation history, which exceeds context limits."},
+      {"letter": "D", "text": "It prevents the model from using tool calls because tool results do not contain text."}
+    ],
+    "correctAnswer": "B",
+    "explanation": "Parsing natural language to detect completion is an anti-pattern because the model's phrasing is non-deterministic. It may say 'Done!' instead of 'task complete,' causing the loop to continue, or phrase an intermediate step as if it were a conclusion, causing premature termination. The correct signal is the structured stop_reason field returned by the API."
+  },
+  {
+    "id": "d1-003",
+    "domain": 1,
+    "domainName": "Agentic Architecture & Orchestration",
+    "scenario": "Customer Support Resolution Agent",
+    "text": "A developer sets a hard cap of 10 iterations as the sole termination condition for an agentic loop. After 10 steps the agent is forcibly stopped, regardless of whether the task is complete. What is the main drawback of using an arbitrary iteration cap as the primary stop condition?",
+    "options": [
+      {"letter": "A", "text": "Iteration caps are not supported by the Claude API, so the loop will throw an exception."},
+      {"letter": "B", "text": "The cap may terminate the agent mid-task, leaving work incomplete, or may be too high and allow runaway loops."},
+      {"letter": "C", "text": "Using a cap prevents the model from making tool calls past the fifth iteration."},
+      {"letter": "D", "text": "Iteration caps cause the model to skip reasoning steps in order to finish within the allowed steps."}
+    ],
+    "correctAnswer": "B",
+    "explanation": "Arbitrary iteration caps are a blunt instrument. A complex task may legitimately need more iterations, causing early termination with incomplete results. Conversely, setting the cap too high provides little protection against infinite loops. The correct approach is to use stop_reason as the primary termination signal and treat a maximum-iteration safety net as a last-resort guard, not the primary mechanism."
+  },
+  {
+    "id": "d1-004",
+    "domain": 1,
+    "domainName": "Agentic Architecture & Orchestration",
+    "text": "After a tool returns its result, a developer discards it and only passes the original user message to the model in the next API call. What is the consequence?",
+    "options": [
+      {"letter": "A", "text": "The model will automatically re-fetch the tool result from its internal memory."},
+      {"letter": "B", "text": "The model will lose awareness of what the tool returned and may repeat the same tool call indefinitely."},
+      {"letter": "C", "text": "The API will return an error because tool results are mandatory in every request."},
+      {"letter": "D", "text": "The model will infer the tool result from context and proceed correctly."}
+    ],
+    "correctAnswer": "B",
+    "explanation": "Tool results must be appended to the conversation history before the next API call. Without them, the model has no record of what the tool returned, and it will likely re-request the same tool, creating an infinite loop or nonsensical output. The model has no internal memory between API calls — all state lives in the messages array."
+  },
+  {
+    "id": "d1-005",
+    "domain": 1,
+    "domainName": "Agentic Architecture & Orchestration",
+    "text": "An engineer argues that model-driven decision-making in agentic loops is inferior to pre-configured decision trees because decision trees are deterministic. Which statement best captures the trade-off?",
+    "options": [
+      {"letter": "A", "text": "Model-driven decision-making is always preferable because it can handle any task without explicit programming."},
+      {"letter": "B", "text": "Pre-configured decision trees are superior in all cases because they are fully auditable."},
+      {"letter": "C", "text": "Decision trees excel at predictable, bounded workflows, while model-driven approaches handle open-ended tasks where the path cannot be fully enumerated in advance."},
+      {"letter": "D", "text": "Decision trees and model-driven approaches are equivalent in capability; the choice is purely a matter of team preference."}
+    ],
+    "correctAnswer": "C",
+    "explanation": "Pre-configured decision trees are excellent when every branch can be anticipated — they are deterministic and auditable. Model-driven decision-making shines when the task space is open-ended, ambiguous, or requires reasoning about novel situations that cannot be pre-enumerated. The best architectures often combine both: use programmatic gates for critical invariants and model judgment for adaptive reasoning."
+  },
+  {
+    "id": "d1-006",
+    "domain": 1,
+    "domainName": "Agentic Architecture & Orchestration",
+    "scenario": "Customer Support Resolution Agent",
+    "text": "Your agent loop receives stop_reason 'end_turn' from the API. What is the correct action?",
+    "options": [
+      {"letter": "A", "text": "Execute any remaining queued tool calls, then continue sending requests to the model."},
+      {"letter": "B", "text": "Terminate the loop and return the model's final text response to the caller."},
+      {"letter": "C", "text": "Append an empty tool result to conversation history and call the API again to confirm."},
+      {"letter": "D", "text": "Reset conversation history and restart the task from the beginning."}
+    ],
+    "correctAnswer": "B",
+    "explanation": "The stop_reason 'end_turn' is the model's signal that it has produced its final response and no further tool calls are pending. The correct behavior is to terminate the agentic loop and surface the response to the caller. Continuing to call the API after 'end_turn' wastes tokens and may produce nonsensical follow-up responses."
+  },
+  {
+    "id": "d1-007",
+    "domain": 1,
+    "domainName": "Agentic Architecture & Orchestration",
+    "scenario": "Multi-Agent Research System",
+    "text": "In a hub-and-spoke multi-agent system, a subagent responsible for web research completes its work and needs to return findings to the document analysis subagent. Which communication pattern is correct?",
+    "options": [
+      {"letter": "A", "text": "The web research subagent directly calls the document analysis subagent's API endpoint."},
+      {"letter": "B", "text": "The web research subagent stores findings in a shared database that the document analysis subagent polls."},
+      {"letter": "C", "text": "The web research subagent returns its findings to the coordinator, which then passes them to the document analysis subagent."},
+      {"letter": "D", "text": "Both subagents share a unified conversation history so findings propagate automatically."}
+    ],
+    "correctAnswer": "C",
+    "explanation": "In hub-and-spoke architecture, the coordinator manages all inter-subagent communication. Subagents do not communicate directly with each other — they report results to the coordinator, which decides how and when to route information to other subagents. This keeps the architecture clean and ensures the coordinator maintains full situational awareness."
+  },
+  {
+    "id": "d1-008",
+    "domain": 1,
+    "domainName": "Agentic Architecture & Orchestration",
+    "scenario": "Multi-Agent Research System",
+    "text": "A coordinator agent has spent 15 turns gathering context about a research topic. It then spawns a subagent to write the final report. The subagent produces a generic, poorly-scoped report. What is the most likely cause?",
+    "options": [
+      {"letter": "A", "text": "The subagent model is smaller and less capable than the coordinator model."},
+      {"letter": "B", "text": "Subagents do not inherit the coordinator's conversation history; the subagent received insufficient context in its prompt."},
+      {"letter": "C", "text": "The coordinator failed to call the subagent with the correct tool name."},
+      {"letter": "D", "text": "The subagent's context window was exceeded, causing it to truncate its output."}
+    ],
+    "correctAnswer": "B",
+    "explanation": "Subagents have isolated context — they do not automatically inherit the coordinator's conversation history. Any context the subagent needs must be explicitly included in the prompt passed to it. If the coordinator only passes a brief task description without the accumulated research findings, the subagent has no basis for a focused report."
+  },
+  {
+    "id": "d1-009",
+    "domain": 1,
+    "domainName": "Agentic Architecture & Orchestration",
+    "scenario": "Multi-Agent Research System",
+    "text": "Which of the following best describes the coordinator's responsibilities in a hub-and-spoke multi-agent system?",
+    "options": [
+      {"letter": "A", "text": "Executing all tool calls directly rather than delegating to subagents to maintain control."},
+      {"letter": "B", "text": "Task decomposition, delegation to specialized subagents, and aggregating their results into a coherent output."},
+      {"letter": "C", "text": "Monitoring subagent execution logs and alerting humans when anomalies are detected."},
+      {"letter": "D", "text": "Providing a shared memory store that all subagents read from and write to concurrently."}
+    ],
+    "correctAnswer": "B",
+    "explanation": "The coordinator's core responsibilities are: decomposing the high-level task into subtasks, delegating each subtask to an appropriate subagent with sufficient context, and aggregating the results into a final output. It acts as an orchestrator, not a direct executor of every tool call."
+  },
+  {
+    "id": "d1-010",
+    "domain": 1,
+    "domainName": "Agentic Architecture & Orchestration",
+    "scenario": "Multi-Agent Research System",
+    "text": "A coordinator is given the task 'Research the economic impact of renewable energy adoption.' It decomposes this into 47 highly specific subtasks, each assigned to a separate subagent. What architectural risk does this create?",
+    "options": [
+      {"letter": "A", "text": "The coordinator will run out of available tool slots because Claude only supports up to 20 simultaneous tool definitions."},
+      {"letter": "B", "text": "Overly narrow decomposition may leave coverage gaps, with no subagent responsible for cross-cutting themes like policy interaction or regional variation."},
+      {"letter": "C", "text": "Parallel execution of 47 subagents will cause API rate limiting that degrades performance."},
+      {"letter": "D", "text": "Each subagent will independently re-research the same foundational background, wasting compute."}
+    ],
+    "correctAnswer": "B",
+    "explanation": "Overly granular task decomposition is a known anti-pattern. When tasks are sliced too narrowly, important cross-cutting themes fall between the cracks — no single subagent is responsible for synthesizing how different domains interact. The coordinator must balance specificity (enabling focused subagent work) with breadth (ensuring full topic coverage)."
+  },
+  {
+    "id": "d1-011",
+    "domain": 1,
+    "domainName": "Agentic Architecture & Orchestration",
+    "scenario": "Multi-Agent Research System",
+    "text": "A coordinator agent needs to pass the results of a literature review subagent to a synthesis subagent. The literature subagent returns 12 paragraphs of prose. What is the risk of passing this prose directly as the synthesis subagent's context?",
+    "options": [
+      {"letter": "A", "text": "Prose is not a valid input format for subagent prompts; structured JSON must be used."},
+      {"letter": "B", "text": "Attribution information (source URLs, page numbers) may be lost, making it impossible for the synthesis agent to cite sources accurately."},
+      {"letter": "C", "text": "The synthesis agent cannot process more than three paragraphs without exceeding its reasoning capacity."},
+      {"letter": "D", "text": "Passing prose between subagents violates the hub-and-spoke communication constraint."}
+    ],
+    "correctAnswer": "B",
+    "explanation": "Unstructured prose loses provenance metadata. When the synthesis agent needs to produce citations or the coordinator needs to trace where a specific claim came from, that information is unavailable. Structured data formats (e.g., arrays of objects with source URL, excerpt, and page number fields) preserve attribution through the pipeline."
+  },
+  {
+    "id": "d1-012",
+    "domain": 1,
+    "domainName": "Agentic Architecture & Orchestration",
+    "scenario": "Multi-Agent Research System",
+    "text": "What is the most accurate description of what happens when multiple subagents are assigned different parts of a task in a hub-and-spoke architecture?",
+    "options": [
+      {"letter": "A", "text": "Subagents share a common conversation thread and can read each other's messages in real time."},
+      {"letter": "B", "text": "Each subagent operates with only the context provided in its own prompt and does not see other subagents' work."},
+      {"letter": "C", "text": "Subagents inherit the system prompt of the coordinator but not its conversation history."},
+      {"letter": "D", "text": "Subagents are granted read-only access to the coordinator's message history for context."}
+    ],
+    "correctAnswer": "B",
+    "explanation": "Subagent isolation is a fundamental architectural characteristic. Each subagent is a separate model invocation with its own independent context window. It only sees what the coordinator explicitly includes in its prompt. This isolation is what enables parallelism and specialization, but it also means the coordinator bears full responsibility for context passing."
+  },
+  {
+    "id": "d1-013",
+    "domain": 1,
+    "domainName": "Agentic Architecture & Orchestration",
+    "text": "A coordinator agent needs to spawn subagents using the Task tool. However, attempts to invoke Task fail silently and no subagents are created. What is the most likely configuration error?",
+    "options": [
+      {"letter": "A", "text": "The coordinator's system prompt does not mention that it should use subagents."},
+      {"letter": "B", "text": "The coordinator's allowedTools list does not include the 'Task' tool, so it cannot invoke subagents."},
+      {"letter": "C", "text": "The Task tool is deprecated and has been replaced by the Spawn tool in recent SDK versions."},
+      {"letter": "D", "text": "Subagents can only be invoked from the user turn, not from within an assistant's tool call."}
+    ],
+    "correctAnswer": "B",
+    "explanation": "The Task tool must be explicitly listed in the coordinator's allowedTools for it to be available. If it is absent, the coordinator has no mechanism to spawn subagents and the capability is silently unavailable. This is a common misconfiguration when setting up multi-agent systems."
+  },
+  {
+    "id": "d1-014",
+    "domain": 1,
+    "domainName": "Agentic Architecture & Orchestration",
+    "scenario": "Multi-Agent Research System",
+    "text": "A coordinator needs to launch three research subagents (web search, document analysis, and database query) simultaneously to minimize latency. How should the coordinator structure its response?",
+    "options": [
+      {"letter": "A", "text": "Issue three separate API responses in sequence, one Task tool call per response, waiting for each to complete before issuing the next."},
+      {"letter": "B", "text": "Emit all three Task tool calls in a single coordinator response so they can be executed in parallel."},
+      {"letter": "C", "text": "Include the three subtasks in a single Task tool call as a JSON array of task descriptions."},
+      {"letter": "D", "text": "Spawn a meta-coordinator subagent and have it issue the three Task calls on the coordinator's behalf."}
+    ],
+    "correctAnswer": "B",
+    "explanation": "To achieve parallel subagent execution, the coordinator must emit multiple Task tool calls in a single response. When the runtime sees multiple tool calls in one response, it can execute them concurrently. Issuing them sequentially in separate API responses forces serial execution, negating the latency benefit of parallelism."
+  },
+  {
+    "id": "d1-015",
+    "domain": 1,
+    "domainName": "Agentic Architecture & Orchestration",
+    "scenario": "Multi-Agent Research System",
+    "text": "A subagent is spawned with the prompt: 'Analyze the document.' The subagent returns shallow, unfocused analysis. No other context was provided. What is the correct fix?",
+    "options": [
+      {"letter": "A", "text": "Use a more powerful model for the subagent so it can infer the required context."},
+      {"letter": "B", "text": "Explicitly include the document content, analysis criteria, and expected output format in the subagent's prompt."},
+      {"letter": "C", "text": "Configure the subagent with access to the coordinator's tool history so it can reconstruct context."},
+      {"letter": "D", "text": "Chain multiple subagents in sequence so each one adds more depth to the previous analysis."}
+    ],
+    "correctAnswer": "B",
+    "explanation": "Subagent context must be explicitly provided in the prompt — the subagent cannot infer what to analyze or how without being told. A prompt that only says 'Analyze the document' lacks the document itself, the analytical lens, the depth required, and the output format. All of this must be supplied by the coordinator."
+  },
+  {
+    "id": "d1-016",
+    "domain": 1,
+    "domainName": "Agentic Architecture & Orchestration",
+    "scenario": "Customer Support Resolution Agent",
+    "text": "Production data shows that in 12% of cases, your agent skips get_customer entirely and calls lookup_order using only the customer's stated name, occasionally leading to misidentified accounts and incorrect refunds. What change would most effectively address this reliability issue?",
+    "options": [
+      {"letter": "A", "text": "Add a programmatic prerequisite that blocks lookup_order and process_refund calls until get_customer has returned a verified customer ID."},
+      {"letter": "B", "text": "Enhance the system prompt to state that customer verification via get_customer is mandatory before any order operations."},
+      {"letter": "C", "text": "Add few-shot examples showing the agent always calling get_customer first, even when customers volunteer order details."},
+      {"letter": "D", "text": "Implement a routing classifier that analyzes each request and enables only the subset of tools appropriate for that request type."}
+    ],
+    "correctAnswer": "A",
+    "explanation": "When a specific tool sequence is required for critical business logic (like verifying customer identity before processing refunds), programmatic enforcement provides deterministic guarantees that prompt-based approaches cannot. Options B and C rely on probabilistic LLM compliance, which is insufficient when errors have financial consequences. Option D addresses tool availability rather than tool ordering, which is not the actual problem.",
+    "scenario": "Customer Support Resolution Agent"
+  },
+  {
+    "id": "d1-017",
+    "domain": 1,
+    "domainName": "Agentic Architecture & Orchestration",
+    "scenario": "Customer Support Resolution Agent",
+    "text": "An agent is instructed in its system prompt to always confirm the customer's account status before issuing a refund. In testing, the agent follows this correctly 97% of the time. Should this prompt-based approach be used for production refund processing?",
+    "options": [
+      {"letter": "A", "text": "Yes — 97% compliance is statistically excellent and acceptable for financial operations."},
+      {"letter": "B", "text": "Yes — the remaining 3% will be caught by downstream payment processor validation."},
+      {"letter": "C", "text": "No — prompt instructions have a non-zero failure rate; critical financial sequences require programmatic enforcement to provide deterministic guarantees."},
+      {"letter": "D", "text": "No — prompt-based instructions are never reliable and should never be used for any operational guidance."}
+    ],
+    "correctAnswer": "C",
+    "explanation": "A 3% failure rate translates to significant errors at scale. Prompt instructions alone have a non-zero failure rate that cannot be driven to zero through better prompting. Critical sequences — especially those with financial consequences — require programmatic enforcement (hooks, prerequisite checks) that guarantee the sequence is followed regardless of model behavior."
+  },
+  {
+    "id": "d1-018",
+    "domain": 1,
+    "domainName": "Agentic Architecture & Orchestration",
+    "scenario": "Customer Support Resolution Agent",
+    "text": "A Tier 2 support agent needs to escalate a complex billing dispute to a human specialist. What should the handoff summary include to be maximally useful?",
+    "options": [
+      {"letter": "A", "text": "The full raw transcript of the conversation so the specialist can read everything in context."},
+      {"letter": "B", "text": "The customer's account ID, root cause of the dispute, steps already taken, and the recommended action for the specialist."},
+      {"letter": "C", "text": "A brief one-line description of the issue category, e.g., 'billing dispute.'"},
+      {"letter": "D", "text": "The agent's confidence score for each possible resolution path."}
+    ],
+    "correctAnswer": "B",
+    "explanation": "A structured handoff summary should give the human specialist exactly what they need to act: the customer identifier, what the root cause is, what the agent already tried, and what action is recommended. A full raw transcript (A) is overwhelming and unstructured. A one-line description (C) lacks actionable detail. Confidence scores (D) are not what a specialist needs to take action."
+  },
+  {
+    "id": "d1-019",
+    "domain": 1,
+    "domainName": "Agentic Architecture & Orchestration",
+    "text": "Which of the following is an example of a programmatic prerequisite gate as opposed to a prompt-based guideline?",
+    "options": [
+      {"letter": "A", "text": "A system prompt instruction: 'Always verify the user's identity before accessing account data.'"},
+      {"letter": "B", "text": "A few-shot example showing the agent checking credentials before accessing data."},
+      {"letter": "C", "text": "A middleware function that intercepts any call to get_account_data and returns an error if no valid session token is present."},
+      {"letter": "D", "text": "A model fine-tuned to prioritize identity verification in its response generation."}
+    ],
+    "correctAnswer": "C",
+    "explanation": "A programmatic prerequisite is code-level enforcement that executes regardless of model behavior. Option C is a middleware gate — it operates outside the model and provides a deterministic guarantee. Options A and B are probabilistic prompt-based guidance. Option D shifts the probability distribution but still cannot guarantee compliance."
+  },
+  {
+    "id": "d1-020",
+    "domain": 1,
+    "domainName": "Agentic Architecture & Orchestration",
+    "text": "A developer is deciding between prompt-based guidance and programmatic enforcement for a workflow step that logs all tool calls for compliance auditing. Which approach is more appropriate and why?",
+    "options": [
+      {"letter": "A", "text": "Prompt-based, because instructing the model to narrate its tool usage is sufficient for audit purposes."},
+      {"letter": "B", "text": "Programmatic, because compliance logging must be deterministic and cannot depend on the model choosing to announce its actions."},
+      {"letter": "C", "text": "Prompt-based, because audit logging is a low-stakes operation that doesn't require programmatic enforcement."},
+      {"letter": "D", "text": "Either approach is equally valid for logging since it is a side-effect operation."}
+    ],
+    "correctAnswer": "B",
+    "explanation": "Compliance auditing requires complete, accurate records. If logging depends on the model choosing to describe its actions, there will be gaps and inaccuracies. Programmatic logging intercepts all tool calls at the infrastructure level, ensuring every action is recorded regardless of model behavior. This is exactly the use case for programmatic enforcement over prompt guidance."
+  },
+  {
+    "id": "d1-021",
+    "domain": 1,
+    "domainName": "Agentic Architecture & Orchestration",
+    "text": "Which Claude SDK hook intercepts a tool's result before the model receives it, allowing transformation or enrichment of the data?",
+    "options": [
+      {"letter": "A", "text": "PreToolCall hook"},
+      {"letter": "B", "text": "OnModelResponse hook"},
+      {"letter": "C", "text": "PostToolUse hook"},
+      {"letter": "D", "text": "ToolResultFilter hook"}
+    ],
+    "correctAnswer": "C",
+    "explanation": "The PostToolUse hook fires after a tool executes and before its result is appended to the conversation for the model to process. This allows the agent framework to transform, enrich, redact, or validate the raw tool result before the model sees it. PreToolCall fires before execution, making it useful for blocking but not result transformation."
+  },
+  {
+    "id": "d1-022",
+    "domain": 1,
+    "domainName": "Agentic Architecture & Orchestration",
+    "scenario": "Customer Support Resolution Agent",
+    "text": "You want to prevent the agent from issuing refunds greater than $500 without human approval. Which implementation provides the strongest guarantee?",
+    "options": [
+      {"letter": "A", "text": "Add a system prompt rule: 'Never issue refunds greater than $500 without manager approval.'"},
+      {"letter": "B", "text": "Use a PreToolCall hook that intercepts calls to process_refund, checks the amount parameter, and blocks execution if amount > 500."},
+      {"letter": "C", "text": "Add a few-shot example where the agent correctly escalates a $600 refund request."},
+      {"letter": "D", "text": "Train the model with reinforcement learning on examples where it correctly routes large refunds."}
+    ],
+    "correctAnswer": "B",
+    "explanation": "A PreToolCall hook intercepts the tool invocation before execution and can enforce the policy deterministically — if the amount exceeds $500, the call is blocked and a human-approval workflow is triggered. This is code-level enforcement that provides a deterministic guarantee. System prompt instructions and few-shot examples are probabilistic. Fine-tuning (D) shifts probabilities but cannot guarantee compliance."
+  },
+  {
+    "id": "d1-023",
+    "domain": 1,
+    "domainName": "Agentic Architecture & Orchestration",
+    "text": "A PostToolUse hook is used to inject structured metadata (timestamps, request IDs, upstream service version) into every tool result before the model processes it. What is the primary benefit of this pattern?",
+    "options": [
+      {"letter": "A", "text": "It reduces token usage by compressing the tool result before sending it to the model."},
+      {"letter": "B", "text": "It enriches tool results with provenance data, enabling the model to reason about data freshness and source without requiring additional tool calls."},
+      {"letter": "C", "text": "It prevents the model from seeing raw tool output, which improves safety by filtering sensitive information."},
+      {"letter": "D", "text": "It allows multiple tool results to be merged into a single context entry to save context window space."}
+    ],
+    "correctAnswer": "B",
+    "explanation": "Enriching tool results via PostToolUse allows the model to reason about important metadata (when data was retrieved, from which version of an upstream service) without needing to make separate metadata-fetching tool calls. This improves reasoning quality while reducing the number of loop iterations needed."
+  },
+  {
+    "id": "d1-024",
+    "domain": 1,
+    "domainName": "Agentic Architecture & Orchestration",
+    "text": "Why do SDK hooks provide stronger compliance guarantees than equivalent instructions in the system prompt?",
+    "options": [
+      {"letter": "A", "text": "Hooks are processed by a separate, more reliable model that specializes in rule enforcement."},
+      {"letter": "B", "text": "Hooks execute as deterministic code outside the model's probabilistic reasoning, so they cannot be bypassed by unexpected model outputs."},
+      {"letter": "C", "text": "Hooks run before the system prompt is loaded, giving them higher priority in the instruction hierarchy."},
+      {"letter": "D", "text": "Hooks permanently modify the model's weights to reinforce the desired behavior."}
+    ],
+    "correctAnswer": "B",
+    "explanation": "Hooks are code — they execute deterministically in the application layer, independent of the model's outputs. A prompt instruction is a probabilistic nudge; a hook is an absolute gate. Even if the model produces an unexpected output or attempts a policy-violating action, a hook will intercept it. This is why hooks are preferred for security-critical or compliance-critical constraints."
+  },
+  {
+    "id": "d1-025",
+    "domain": 1,
+    "domainName": "Agentic Architecture & Orchestration",
+    "text": "An agentic framework uses a PostToolUse hook to validate that every database write tool call includes a required 'audit_user' field. If the field is absent, the hook returns an error to the model. What type of enforcement does this represent?",
+    "options": [
+      {"letter": "A", "text": "Probabilistic compliance — the hook increases the likelihood but cannot guarantee the field is present."},
+      {"letter": "B", "text": "Deterministic enforcement — the hook guarantees the write never succeeds without 'audit_user' by blocking non-compliant calls."},
+      {"letter": "C", "text": "Advisory enforcement — the hook logs a warning but allows the write to proceed."},
+      {"letter": "D", "text": "Retroactive enforcement — the hook adds the field after the write completes."}
+    ],
+    "correctAnswer": "B",
+    "explanation": "A hook that returns an error when a required field is absent provides deterministic enforcement — every non-compliant call is blocked without exception. This is not probabilistic; it is a hard gate. The model receives an error and must correct the call before the write can proceed, guaranteeing that no write ever succeeds without the audit field."
+  },
+  {
+    "id": "d1-026",
+    "domain": 1,
+    "domainName": "Agentic Architecture & Orchestration",
+    "text": "What is the key distinction between prompt chaining and dynamic task decomposition in multi-step workflows?",
+    "options": [
+      {"letter": "A", "text": "Prompt chaining uses multiple models; dynamic decomposition uses a single model."},
+      {"letter": "B", "text": "Prompt chaining follows a fixed, pre-defined sequence of steps; dynamic decomposition adapts the plan based on findings from earlier steps."},
+      {"letter": "C", "text": "Prompt chaining is only suitable for text generation tasks; dynamic decomposition is for data retrieval tasks."},
+      {"letter": "D", "text": "Dynamic decomposition requires human-in-the-loop approval at each step; prompt chaining runs fully autonomously."}
+    ],
+    "correctAnswer": "B",
+    "explanation": "Prompt chaining is a fixed sequential pipeline where each step's role is predetermined — useful when the workflow is well-understood and invariant. Dynamic decomposition allows the agent to decide the next steps based on what it discovers at runtime, making it suitable for open-ended tasks where the path cannot be fully enumerated in advance."
+  },
+  {
+    "id": "d1-027",
+    "domain": 1,
+    "domainName": "Agentic Architecture & Orchestration",
+    "text": "A code review agent is tasked with reviewing a 50,000-line monorepo. Sending the entire codebase in one context yields poor results due to context dilution. What decomposition strategy is most appropriate?",
+    "options": [
+      {"letter": "A", "text": "Split the review into a per-file local analysis pass for isolated issues, followed by a separate cross-file integration pass for architectural concerns."},
+      {"letter": "B", "text": "Randomly sample 10% of files for review and extrapolate findings to the full codebase."},
+      {"letter": "C", "text": "Use a single large-context model invocation and rely on attention mechanisms to focus on relevant sections."},
+      {"letter": "D", "text": "Review only files that were modified in the last 30 days to reduce scope."}
+    ],
+    "correctAnswer": "A",
+    "explanation": "Large code reviews benefit from a two-pass decomposition: first, a per-file local analysis that examines each file in isolation for style, logic, and correctness issues; then a separate cross-file integration pass that examines how components interact, API contracts, and architectural concerns. This separation of concerns produces higher-quality analysis than a single diluted context or arbitrary sampling."
+  },
+  {
+    "id": "d1-028",
+    "domain": 1,
+    "domainName": "Agentic Architecture & Orchestration",
+    "text": "An agent is assigned the open-ended task: 'Improve the performance of our e-commerce platform.' What decomposition strategy is best suited to this task?",
+    "options": [
+      {"letter": "A", "text": "Prompt chaining with a fixed 5-step plan: profile, identify bottlenecks, implement caching, optimize queries, test."},
+      {"letter": "B", "text": "Assign the entire task to a single model invocation with the full codebase in context."},
+      {"letter": "C", "text": "Discovery phase to understand the platform → planning phase to prioritize opportunities → execution phase with prioritized subtasks."},
+      {"letter": "D", "text": "Decompose by team ownership: one subagent per engineering team responsible for a service."}
+    ],
+    "correctAnswer": "C",
+    "explanation": "Open-ended improvement tasks require an adaptive approach: first discover the current state (profile, audit, understand the system), then plan based on findings (prioritize by impact), then execute. Skipping discovery with a fixed plan (A) may address the wrong bottlenecks. Team-based decomposition (D) fragments the task artificially and misses system-wide issues."
+  },
+  {
+    "id": "d1-029",
+    "domain": 1,
+    "domainName": "Agentic Architecture & Orchestration",
+    "text": "In a prompt chaining workflow for document summarization, each step produces a summary that is passed to the next step. At step 3 of 5, the model produces an unexpectedly broad summary that changes the scope of subsequent steps. What is a key limitation of prompt chaining this scenario illustrates?",
+    "options": [
+      {"letter": "A", "text": "Prompt chains cannot handle documents longer than 10,000 tokens."},
+      {"letter": "B", "text": "Errors or unexpected outputs at one step propagate through the rest of the fixed chain without opportunity to adapt the plan."},
+      {"letter": "C", "text": "Prompt chaining requires all steps to use the same model, which limits specialization."},
+      {"letter": "D", "text": "The chain cannot be parallelized, so it is always slower than dynamic decomposition."}
+    ],
+    "correctAnswer": "B",
+    "explanation": "A key limitation of fixed prompt chains is error propagation. When a step produces unexpected output, the remaining steps continue with that flawed foundation, often compounding the problem. Dynamic decomposition mitigates this by evaluating intermediate results and adjusting the plan accordingly, but prompt chains sacrifice this flexibility for predictability."
+  },
+  {
+    "id": "d1-030",
+    "domain": 1,
+    "domainName": "Agentic Architecture & Orchestration",
+    "scenario": "Multi-Agent Research System",
+    "text": "A research workflow requires: (1) identify sub-topics from a broad question, (2) research each sub-topic in parallel, (3) synthesize findings. Which decomposition pattern fits this structure?",
+    "options": [
+      {"letter": "A", "text": "Pure prompt chaining, because the steps are sequential."},
+      {"letter": "B", "text": "Dynamic decomposition where step 1 determines the plan for steps 2 and 3 based on the identified sub-topics."},
+      {"letter": "C", "text": "A single subagent that handles all three phases sequentially in one context window."},
+      {"letter": "D", "text": "Human-in-the-loop decomposition where a person assigns sub-topics to subagents."}
+    ],
+    "correctAnswer": "B",
+    "explanation": "This is a canonical dynamic decomposition scenario. The output of step 1 (sub-topic identification) is not known in advance, so it cannot be statically pre-configured in a prompt chain. The coordinator dynamically creates step-2 subagent assignments based on the sub-topics discovered in step 1. This adaptive planning is exactly what dynamic decomposition enables."
+  },
+  {
+    "id": "d1-031",
+    "domain": 1,
+    "domainName": "Agentic Architecture & Orchestration",
+    "text": "After a long debugging session, a developer resumes a named Claude Code session with `--resume debug-session`. The session was paused after several source files were modified externally by another developer. What critical step must be taken when resuming?",
+    "options": [
+      {"letter": "A", "text": "Nothing additional — Claude automatically detects file changes when a session resumes."},
+      {"letter": "B", "text": "Inform the agent about the file changes when resuming, so it does not reason from a stale mental model of the codebase."},
+      {"letter": "C", "text": "Restart with a fresh session; resuming a session after file changes always causes context corruption."},
+      {"letter": "D", "text": "Roll back the external file changes before resuming so the session context remains consistent."}
+    ],
+    "correctAnswer": "B",
+    "explanation": "When resuming a session after external file modifications, the agent's in-context understanding of those files is stale. It must be explicitly told about the changes so it can re-read the modified files and update its reasoning accordingly. Claude does not automatically detect external file changes on resume; the developer must bridge this information gap."
+  },
+  {
+    "id": "d1-032",
+    "domain": 1,
+    "domainName": "Agentic Architecture & Orchestration",
+    "text": "A team wants to explore two competing approaches to refactoring a module, starting from the same validated baseline. Which session management strategy is most appropriate?",
+    "options": [
+      {"letter": "A", "text": "Run both approaches in the same session sequentially, undoing changes between attempts."},
+      {"letter": "B", "text": "Use fork_session to create two independent sessions from the shared baseline, allowing divergent exploration without contamination."},
+      {"letter": "C", "text": "Create two entirely new sessions with no shared context, requiring each to re-establish the baseline independently."},
+      {"letter": "D", "text": "Use --resume on the same session for both approaches, relying on the model to track which approach it is currently working on."}
+    ],
+    "correctAnswer": "B",
+    "explanation": "fork_session is designed precisely for this use case: it creates two sessions that share a common starting point (the validated baseline) but can diverge independently. This avoids the contamination of running both in the same session and the inefficiency of recreating context from scratch for two separate fresh sessions."
+  },
+  {
+    "id": "d1-033",
+    "domain": 1,
+    "domainName": "Agentic Architecture & Orchestration",
+    "text": "When should you prefer resuming a named session with `--resume` over starting a fresh session with an injected summary?",
+    "options": [
+      {"letter": "A", "text": "Always use --resume to preserve all context; fresh sessions discard useful information."},
+      {"letter": "B", "text": "Use --resume when prior context is still valid and the tool results are current; use a fresh session with an injected summary when tool results are stale or the context contains outdated state."},
+      {"letter": "C", "text": "Use fresh sessions when the task is complex; use --resume for simple tasks."},
+      {"letter": "D", "text": "Use --resume when working alone; use fresh sessions when collaborating with other developers."}
+    ],
+    "correctAnswer": "B",
+    "explanation": "Session resume is most valuable when the accumulated context (previous tool results, reasoning chains) is still valid and relevant. When tool results are stale (e.g., a database state that has since changed) or when context contains outdated assumptions, a fresh session with a well-crafted injected summary provides cleaner reasoning without the noise of stale data."
+  },
+  {
+    "id": "d1-034",
+    "domain": 1,
+    "domainName": "Agentic Architecture & Orchestration",
+    "text": "What is the correct CLI syntax to resume a named Claude Code session called 'feature-auth'?",
+    "options": [
+      {"letter": "A", "text": "`claude --continue feature-auth`"},
+      {"letter": "B", "text": "`claude --resume feature-auth`"},
+      {"letter": "C", "text": "`claude --session feature-auth --load`"},
+      {"letter": "D", "text": "`claude resume --name feature-auth`"}
+    ],
+    "correctAnswer": "B",
+    "explanation": "The correct syntax is `--resume <session-name>`. This flag instructs Claude Code to load the named session's context and continue from where it left off. The other options use incorrect flag names or command structures that are not part of the Claude Code CLI interface."
+  },
+  {
+    "id": "d1-035",
+    "domain": 1,
+    "domainName": "Agentic Architecture & Orchestration",
+    "text": "A developer is working on a long refactoring task in a named session. Midway through, the CI pipeline updates several auto-generated configuration files. The developer resumes the session an hour later without informing the agent. What is the most likely consequence?",
+    "options": [
+      {"letter": "A", "text": "The agent will automatically re-read all files in the repository to detect changes."},
+      {"letter": "B", "text": "The agent may make decisions based on the pre-change file content, introducing bugs or reverting the auto-generated updates."},
+      {"letter": "C", "text": "The session will fail to resume because the file checksums no longer match the session state."},
+      {"letter": "D", "text": "The agent will prompt the user to list all changed files before proceeding."}
+    ],
+    "correctAnswer": "B",
+    "explanation": "The agent's in-context model of the codebase includes the pre-change state of those configuration files. If not informed of the updates, it may write code that references stale configuration values, or worse, overwrite the auto-generated updates with a version it constructs from its stale understanding. Explicitly informing the agent about changes is the developer's responsibility."
+  },
+  {
+    "id": "d1-036",
+    "domain": 1,
+    "domainName": "Agentic Architecture & Orchestration",
+    "text": "What does fork_session provide that simply opening two new sessions does not?",
+    "options": [
+      {"letter": "A", "text": "Lower API costs due to shared token billing between forked sessions."},
+      {"letter": "B", "text": "A common starting context (shared baseline) that both forked sessions inherit, avoiding redundant context reconstruction."},
+      {"letter": "C", "text": "The ability to merge the two sessions' outputs into a single result automatically."},
+      {"letter": "D", "text": "Real-time synchronization between the two forked sessions as they diverge."}
+    ],
+    "correctAnswer": "B",
+    "explanation": "fork_session creates two sessions that share a validated starting baseline. Each session then diverges independently. The key advantage over two fresh sessions is that neither needs to re-establish the baseline context — the shared starting point is inherited. Two new sessions would require each to independently re-read files, re-execute setup steps, and rebuild understanding from scratch."
+  },
+  {
+    "id": "d1-037",
+    "domain": 1,
+    "domainName": "Agentic Architecture & Orchestration",
+    "scenario": "Multi-Agent Research System",
+    "text": "After running the multi-agent research system on the topic 'impact of AI on creative industries,' each subagent completes successfully. However, the final reports cover only visual arts, completely missing music, writing, and film production. The coordinator's logs show it decomposed the topic into: 'AI in digital art creation,' 'AI in graphic design,' and 'AI in photography.' What is the most likely root cause?",
+    "options": [
+      {"letter": "A", "text": "The synthesis agent lacks instructions for identifying coverage gaps in the findings it receives from other agents."},
+      {"letter": "B", "text": "The coordinator agent's task decomposition is too narrow, resulting in subagent assignments that don't cover all relevant domains of the topic."},
+      {"letter": "C", "text": "The web search agent's queries are not comprehensive enough and need to be expanded to cover more creative industry sectors."},
+      {"letter": "D", "text": "The document analysis agent is filtering out sources related to non-visual creative industries due to overly restrictive relevance criteria."}
+    ],
+    "correctAnswer": "B",
+    "explanation": "The coordinator's logs reveal the root cause directly: it decomposed 'creative industries' into only visual arts subtasks, completely omitting music, writing, and film. The subagents executed their assigned tasks correctly — the problem is what they were assigned. Options A, C, and D incorrectly blame downstream agents that are working correctly within their assigned scope."
+  },
+  {
+    "id": "d1-038",
+    "domain": 1,
+    "domainName": "Agentic Architecture & Orchestration",
+    "scenario": "Multi-Agent Research System",
+    "text": "The web search subagent times out while researching a complex topic. You need to design how this failure information flows back to the coordinator agent. Which error propagation approach best enables intelligent recovery?",
+    "options": [
+      {"letter": "A", "text": "Return structured error context to the coordinator including the failure type, the attempted query, any partial results, and potential alternative approaches."},
+      {"letter": "B", "text": "Implement automatic retry logic with exponential backoff within the subagent, returning a generic 'search unavailable' status only after all retries are exhausted."},
+      {"letter": "C", "text": "Catch the timeout within the subagent and return an empty result set marked as successful."},
+      {"letter": "D", "text": "Propagate the timeout exception directly to a top-level handler that terminates the entire research workflow."}
+    ],
+    "correctAnswer": "A",
+    "explanation": "Structured error context gives the coordinator the information it needs to make intelligent recovery decisions — whether to retry with a modified query, try an alternative approach, or proceed with partial results. Option B's generic status hides valuable context from the coordinator, preventing informed decisions. Option C suppresses the error by marking failure as success, which prevents any recovery. Option D terminates the entire workflow unnecessarily when recovery strategies could succeed."
+  },
+  {
+    "id": "d1-039",
+    "domain": 1,
+    "domainName": "Agentic Architecture & Orchestration",
+    "text": "A developer is designing a subagent that performs database queries. The subagent will be spawned by a coordinator and must return results in a format the coordinator can use for further delegation. Which data format choice best preserves attribution and supports downstream processing?",
+    "options": [
+      {"letter": "A", "text": "Return results as a single concatenated prose paragraph summarizing the findings."},
+      {"letter": "B", "text": "Return results as a structured JSON array with fields for each record, including source table, query executed, and retrieval timestamp."},
+      {"letter": "C", "text": "Return only the count of matching records to minimize token usage."},
+      {"letter": "D", "text": "Return a SQL dump of the matching rows in raw format without additional metadata."}
+    ],
+    "correctAnswer": "B",
+    "explanation": "Structured data formats (like JSON with explicit fields) preserve attribution — the coordinator and downstream subagents can trace each piece of information to its source, understand when it was retrieved, and determine its provenance. Prose loses structure. Counts lose content. Raw SQL dumps lack the metadata needed for intelligent downstream processing."
+  },
+  {
+    "id": "d1-040",
+    "domain": 1,
+    "domainName": "Agentic Architecture & Orchestration",
+    "text": "A workflow requires three sequential steps where each step's output is the next step's input, and the steps are known in advance. An engineer proposes using dynamic decomposition instead of prompt chaining. What is the main argument against using dynamic decomposition in this case?",
+    "options": [
+      {"letter": "A", "text": "Dynamic decomposition cannot handle sequential workflows; it only supports parallel execution."},
+      {"letter": "B", "text": "For well-understood, fixed workflows, prompt chaining is simpler and more predictable; dynamic decomposition adds adaptive overhead without benefit when the plan is already known."},
+      {"letter": "C", "text": "Dynamic decomposition requires at least five steps to be cost-effective, making it overkill for three-step workflows."},
+      {"letter": "D", "text": "Dynamic decomposition is incompatible with structured data formats required by the downstream steps."}
+    ],
+    "correctAnswer": "B",
+    "explanation": "When the workflow is well-defined and the steps are known in advance, prompt chaining is the right tool. It is simpler to implement, debug, and reason about. Dynamic decomposition adds complexity (the coordinator must decide the plan at runtime) without adding value when there is nothing to discover — the plan is already known. Use the simplest architecture that meets the requirements."
+  }
+]

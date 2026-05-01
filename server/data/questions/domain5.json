@@ -1,0 +1,347 @@
+[
+  {
+    "id": "d5-001",
+    "domain": 5,
+    "domainName": "Context Management & Reliability",
+    "scenario": "Customer Support Resolution Agent",
+    "text": "Your support agent summarizes conversation history to manage context length. After summarization, the agent loses track of exact refund amounts, order dates, and claim numbers mentioned earlier in the conversation. What is the root cause?",
+    "options": [
+      {"letter": "A", "text": "Summarization reduces total token count too aggressively, causing the model to forget recent messages"},
+      {"letter": "B", "text": "Progressive summarization condenses numerical values and dates into vague summaries, losing critical transactional facts"},
+      {"letter": "C", "text": "The model context window is too small to hold both the summary and new messages simultaneously"},
+      {"letter": "D", "text": "Summarization models perform worse on customer support domains than on general text"}
+    ],
+    "correctAnswer": "B",
+    "explanation": "Progressive summarization is effective at compressing narrative content but tends to condense specific transactional facts — exact amounts, dates, claim numbers — into vague references ('the customer mentioned a refund'). These precision losses cascade into errors. The fix is to extract transactional facts into a persistent 'case facts' block that is preserved outside summarized history."
+  },
+  {
+    "id": "d5-002",
+    "domain": 5,
+    "domainName": "Context Management & Reliability",
+    "scenario": "Customer Support Resolution Agent",
+    "text": "A support agent processes long multi-turn conversations. Analysis shows it accurately recalls information from the first few messages and the most recent messages, but frequently misremembers details from messages in the middle of long conversations. What phenomenon explains this?",
+    "options": [
+      {"letter": "A", "text": "Token budget pressure — middle-conversation messages are truncated first when context limits are approached"},
+      {"letter": "B", "text": "Recency bias — models are trained to weight recent information over older information by design"},
+      {"letter": "C", "text": "The 'lost in the middle' effect — models reliably process information at the beginning and end of long inputs but attention degrades for content in the middle"},
+      {"letter": "D", "text": "Conversation threading errors — the model incorrectly associates middle messages with different conversation threads"}
+    ],
+    "correctAnswer": "C",
+    "explanation": "The 'lost in the middle' effect is a well-documented limitation: models reliably process information at the beginning and end of long inputs, but attention quality degrades for content positioned in the middle of a long context. Critical information (case facts, commitments made) should be structured to appear at context boundaries or extracted to persistent blocks."
+  },
+  {
+    "id": "d5-003",
+    "domain": 5,
+    "domainName": "Context Management & Reliability",
+    "scenario": "Customer Support Resolution Agent",
+    "text": "Your agent calls a CRM tool that returns a 40-field customer record, but the agent only needs 5 fields for its current task. Over a long conversation with many tool calls, the agent becomes slow and sometimes incoherent. What is the most likely cause and fix?",
+    "options": [
+      {"letter": "A", "text": "Verbose tool results accumulate and consume tokens disproportionately; trim tool outputs to only the 5 relevant fields before storing them in context"},
+      {"letter": "B", "text": "The agent is making redundant tool calls; add caching to return the same result without re-calling the CRM"},
+      {"letter": "C", "text": "The 40-field responses exceed the tool result size limit; implement pagination to fetch fields in batches"},
+      {"letter": "D", "text": "The CRM response time is causing latency; switch to an async tool call pattern"}
+    ],
+    "correctAnswer": "A",
+    "explanation": "Tool results accumulate in the conversation context and consume tokens disproportionately — a 40-field record when only 5 fields are needed means 35 fields of irrelevant data in context for every tool call. Over many interactions this fills the context window with noise. The fix is to trim verbose tool outputs to only relevant fields before they accumulate in context."
+  },
+  {
+    "id": "d5-004",
+    "domain": 5,
+    "domainName": "Context Management & Reliability",
+    "scenario": "Customer Support Resolution Agent",
+    "text": "You want to preserve critical case facts (order ID: #ORD-8821, refund amount: $142.50, case opened: March 3) across multiple conversation summarizations as context grows. What is the best architectural approach?",
+    "options": [
+      {"letter": "A", "text": "Repeat the critical facts in every message from the agent to ensure they remain in the recent context"},
+      {"letter": "B", "text": "Use a lower summarization ratio so summaries retain more detail and don't lose specific numbers"},
+      {"letter": "C", "text": "Store the facts in a database and have the agent look them up via tool call whenever it needs them"},
+      {"letter": "D", "text": "Extract transactional facts into a persistent 'case facts' block that sits outside the summarized history and is included in every context load"}
+    ],
+    "correctAnswer": "D",
+    "explanation": "A persistent 'case facts' block extracted outside the summarized history ensures transactional facts (IDs, amounts, dates) survive multiple summarization passes. This block is always included when the context is loaded, regardless of how many times the narrative history has been compressed. Repeating facts in every message wastes tokens. Database lookups add latency and complexity."
+  },
+  {
+    "id": "d5-005",
+    "domain": 5,
+    "domainName": "Context Management & Reliability",
+    "scenario": "Customer Support Resolution Agent",
+    "text": "Your system regularly summarizes conversation history but the summaries have become less useful over time. Upon review, you find the model produces summaries like 'Customer had some issues with a previous order and was given compensation.' Critical specifics are lost. What is the most precise fix?",
+    "options": [
+      {"letter": "A", "text": "Instruct the summarizer to explicitly preserve all numerical values, dates, claim IDs, and amounts verbatim rather than paraphrasing them"},
+      {"letter": "B", "text": "Increase the summary length limit so summaries can retain more detail"},
+      {"letter": "C", "text": "Switch to a larger model for summarization that has better retention of specific details"},
+      {"letter": "D", "text": "Use extractive summarization (copy key sentences) instead of abstractive summarization"}
+    ],
+    "correctAnswer": "A",
+    "explanation": "The root cause is the summarizer paraphrasing specifics into vague descriptions. The targeted fix is explicit instruction to preserve numerical values, dates, IDs, and amounts verbatim. This addresses the exact failure mode without the overhead of longer summaries, larger models, or extractive approaches that may include irrelevant sentences."
+  },
+  {
+    "id": "d5-006",
+    "domain": 5,
+    "domainName": "Context Management & Reliability",
+    "scenario": "Customer Support Resolution Agent",
+    "text": "A customer contacts support and, after a lengthy explanation, explicitly says: 'I don't want to deal with a bot anymore. I need to speak to a human agent right now.' How should a well-designed agent respond?",
+    "options": [
+      {"letter": "A", "text": "Immediately escalate to a human agent without attempting to resolve the issue first"},
+      {"letter": "B", "text": "Attempt to resolve the customer's underlying issue first; escalate if resolution fails"},
+      {"letter": "C", "text": "Offer to resolve the issue one more time and escalate only if the customer repeats the request"},
+      {"letter": "D", "text": "Escalate after completing a sentiment analysis pass to verify the request reflects genuine frustration"}
+    ],
+    "correctAnswer": "A",
+    "explanation": "When a customer explicitly requests a human agent, the agent should escalate immediately — this is a non-negotiable trigger that takes absolute priority over any other resolution attempt. Attempting to resolve first, requiring a repeated request, or running sentiment analysis before escalating all violate the principle of respecting an explicit customer demand."
+  },
+  {
+    "id": "d5-007",
+    "domain": 5,
+    "domainName": "Context Management & Reliability",
+    "scenario": "Customer Support Resolution Agent",
+    "text": "Your agent is configured to escalate based on a 'complexity score' computed from case attributes. Analysis shows it sometimes handles highly complex cases autonomously and escalates simple cases with unusual terminology. What does this indicate about complexity score as an escalation signal?",
+    "options": [
+      {"letter": "A", "text": "Complexity scores are unreliable proxies for escalation need — explicit rule-based criteria or few-shot examples are more reliable"},
+      {"letter": "B", "text": "The complexity scoring model needs retraining on a larger labeled dataset"},
+      {"letter": "C", "text": "Terminology analysis should be removed from the complexity score calculation"},
+      {"letter": "D", "text": "The complexity threshold is set too low; raising it will reduce incorrect escalations"}
+    ],
+    "correctAnswer": "A",
+    "explanation": "Complexity scores are unreliable proxies for escalation need — the same failure mode as confidence scores. An agent incorrectly routing based on terminology reflects that the scoring signal doesn't capture what 'needs human review' actually means. Explicit escalation criteria with examples (policy exceptions, explicit human requests) are more reliable than computed scores."
+  },
+  {
+    "id": "d5-008",
+    "domain": 5,
+    "domainName": "Context Management & Reliability",
+    "scenario": "Customer Support Resolution Agent",
+    "text": "Your agent queries a customer database by email address and receives two records matching 'j.smith@example.com'. How should the agent handle this ambiguity?",
+    "options": [
+      {"letter": "A", "text": "Select the most recently active account as the likely match"},
+      {"letter": "B", "text": "Escalate immediately to a human agent since multiple matches indicate a data integrity issue"},
+      {"letter": "C", "text": "Ask the customer for additional identifying information (e.g., last order date or account number) to determine which record is theirs"},
+      {"letter": "D", "text": "Process both accounts and merge relevant information from each record"}
+    ],
+    "correctAnswer": "C",
+    "explanation": "Multiple customer matches should trigger a request for additional identifying information, not heuristic selection. Choosing the 'most recently active' account is an assumption that could lead to acting on the wrong customer's data. Immediate escalation is disproportionate for a common ambiguity that can be resolved with one clarifying question."
+  },
+  {
+    "id": "d5-009",
+    "domain": 5,
+    "domainName": "Context Management & Reliability",
+    "scenario": "Customer Support Resolution Agent",
+    "text": "Your agent encounters a case requiring a 15% exception to the standard return policy. No policy document covers this scenario. How should the agent respond?",
+    "options": [
+      {"letter": "A", "text": "Apply the closest applicable policy and document the exception in the case notes"},
+      {"letter": "B", "text": "Deny the exception and explain the standard return policy to the customer"},
+      {"letter": "C", "text": "Escalate to a human agent because policy gaps — not just complex cases — are a defined escalation trigger"},
+      {"letter": "D", "text": "Ask Claude to infer what the policy would likely say based on similar policy documents"}
+    ],
+    "correctAnswer": "C",
+    "explanation": "Policy gaps are a defined escalation trigger — when an agent encounters a situation not covered by its policies, escalation is appropriate regardless of whether the case appears 'complex' by other measures. Applying the closest policy without authorization risks committing the company to unintended outcomes. Denying without authority is presumptuous. Inferring policy from similar documents could be wrong."
+  },
+  {
+    "id": "d5-010",
+    "domain": 5,
+    "domainName": "Context Management & Reliability",
+    "scenario": "Multi-Agent Codebase Analyzer",
+    "text": "Your multi-agent pipeline has a data retrieval subagent that fails due to a database timeout. Instead of propagating the error, the subagent returns an empty results array, which the coordinator interprets as 'no data found.' What is the problem with this design?",
+    "options": [
+      {"letter": "A", "text": "Access failures (timeout) must be distinguished from valid empty results — silently returning empty as success hides the failure from the coordinator"},
+      {"letter": "B", "text": "The subagent should retry indefinitely until it succeeds rather than returning any result"},
+      {"letter": "C", "text": "The coordinator should always assume empty results indicate a failure and request manual verification"},
+      {"letter": "D", "text": "Database timeouts should terminate the entire pipeline immediately to prevent data inconsistency"}
+    ],
+    "correctAnswer": "A",
+    "explanation": "Access failures (timeout, connection error) and valid empty results (successful query with no matching records) are semantically different outcomes that must be communicated differently. Silently treating a failure as success is an anti-pattern — the coordinator cannot make intelligent recovery decisions if it doesn't know a failure occurred."
+  },
+  {
+    "id": "d5-011",
+    "domain": 5,
+    "domainName": "Context Management & Reliability",
+    "scenario": "Multi-Agent Codebase Analyzer",
+    "text": "A subagent in your pipeline encounters a transient HTTP 503 error when fetching external data. The error is likely due to a momentary service interruption. What is the correct subagent error handling strategy?",
+    "options": [
+      {"letter": "A", "text": "Immediately propagate all errors to the coordinator so it can decide whether to retry"},
+      {"letter": "B", "text": "Suppress the error and continue with partial data to avoid interrupting the pipeline"},
+      {"letter": "C", "text": "Terminate the entire pipeline and require a full restart from the beginning"},
+      {"letter": "D", "text": "Implement local retry logic for transient failures and propagate only errors that cannot be resolved locally"}
+    ],
+    "correctAnswer": "D",
+    "explanation": "Subagents should implement local recovery for transient failures — retrying on 503 errors is well within the subagent's scope. Only errors that cannot be resolved locally (persistent failures, authorization errors, data corruption) should be propagated to the coordinator. Propagating all errors immediately creates unnecessary coordinator complexity. Suppressing errors is the silent-failure anti-pattern."
+  },
+  {
+    "id": "d5-012",
+    "domain": 5,
+    "domainName": "Context Management & Reliability",
+    "scenario": "Multi-Agent Codebase Analyzer",
+    "text": "When a subagent fails, what information should be included in the error context passed to the coordinator to enable intelligent recovery?",
+    "options": [
+      {"letter": "A", "text": "Failure type, the attempted query/operation, any partial results obtained, and alternative approaches the coordinator could try"},
+      {"letter": "B", "text": "Only the error code and message — structured error information adds overhead without improving recovery"},
+      {"letter": "C", "text": "The full stack trace from the subagent so the coordinator can debug the root cause"},
+      {"letter": "D", "text": "Only whether the failure is transient or permanent — the coordinator handles all recovery logic"}
+    ],
+    "correctAnswer": "A",
+    "explanation": "Structured error context should include the failure type (allows pattern matching), the attempted operation (provides context for understanding impact), partial results (may be usable even if complete), and alternative approaches (gives the coordinator actionable recovery options). Just an error code gives the coordinator insufficient information. Full stack traces are debugging artifacts, not recovery information."
+  },
+  {
+    "id": "d5-013",
+    "domain": 5,
+    "domainName": "Context Management & Reliability",
+    "scenario": "Multi-Agent Codebase Analyzer",
+    "text": "Your multi-agent pipeline has 5 subagents. One subagent fails on a non-critical enrichment step. Which anti-pattern should you avoid?",
+    "options": [
+      {"letter": "A", "text": "Terminating the entire workflow on a single non-critical subagent failure when the pipeline could continue with partial results"},
+      {"letter": "B", "text": "Allowing the failed subagent to retry before reporting failure to the coordinator"},
+      {"letter": "C", "text": "Reporting the failure to the coordinator and letting it decide how to proceed"},
+      {"letter": "D", "text": "Continuing the pipeline with the other 4 subagents' results and flagging the missing enrichment data"}
+    ],
+    "correctAnswer": "A",
+    "explanation": "Terminating an entire workflow on a single non-critical failure is an anti-pattern — it's disproportionate and destroys valuable work from successful subagents. The correct approach is graceful degradation: propagate the error with context, let the coordinator assess impact, and continue with partial results when the failed step is non-critical. Allowing retries and continuing with remaining results are both appropriate behaviors."
+  },
+  {
+    "id": "d5-014",
+    "domain": 5,
+    "domainName": "Context Management & Reliability",
+    "scenario": "Multi-Agent Codebase Analyzer",
+    "text": "During a long codebase exploration session, the main agent's responses shift from citing specific class names and functions found earlier to vague references like 'the typical pattern in this codebase.' What is happening and how should you respond?",
+    "options": [
+      {"letter": "A", "text": "The model is appropriately generalizing from specific findings to patterns, indicating successful learning"},
+      {"letter": "B", "text": "Context degradation is occurring — key findings from earlier are being pushed out; use scratchpad files to persist specific findings across context boundaries"},
+      {"letter": "C", "text": "The session has hit a token limit — start a new session and re-explore the codebase from scratch"},
+      {"letter": "D", "text": "The model is uncertain about earlier findings and is hedging — provide more specific prompts to force precise answers"}
+    ],
+    "correctAnswer": "B",
+    "explanation": "Context degradation in extended sessions is characterized by the model transitioning from specific references ('class UserAuthService extends BaseAuth') to vague generalizations ('typical patterns'). This indicates earlier specific findings have been pushed out of active attention. Scratchpad files persist key findings (class names, function signatures, architectural observations) outside the conversation context, making them retrievable across context boundaries."
+  },
+  {
+    "id": "d5-015",
+    "domain": 5,
+    "domainName": "Context Management & Reliability",
+    "scenario": "Multi-Agent Codebase Analyzer",
+    "text": "You're exploring a large codebase and need to map 200+ files' dependencies without exhausting the context window. What pattern best handles this at scale?",
+    "options": [
+      {"letter": "A", "text": "Use the /compact command before each batch of files to maintain available context throughout exploration"},
+      {"letter": "B", "text": "Explore files sequentially and use the /memory command to save progress between sessions"},
+      {"letter": "C", "text": "Increase the context window size by upgrading to a model with a larger token limit"},
+      {"letter": "D", "text": "Delegate file exploration to subagents that isolate verbose output and return only summaries, while the main agent coordinates high-level understanding"}
+    ],
+    "correctAnswer": "D",
+    "explanation": "Subagent delegation is the scalable solution for large codebase exploration. Each subagent explores a portion of the codebase, generates verbose output in its isolated context, and returns only a concise summary to the main agent. The main agent maintains a high-level map without accumulating file-level verbosity. /compact is a useful tool but doesn't scale as gracefully for 200+ files."
+  },
+  {
+    "id": "d5-016",
+    "domain": 5,
+    "domainName": "Context Management & Reliability",
+    "scenario": "Multi-Agent Codebase Analyzer",
+    "text": "During a codebase analysis that will span multiple sessions, the main Claude Code session crashes midway through. What design pattern allows the analysis to resume from the checkpoint rather than restart?",
+    "options": [
+      {"letter": "A", "text": "Structured state exports (manifests) that the coordinator writes after each major milestone and loads on resume"},
+      {"letter": "B", "text": "The /memory command, which automatically saves session state that persists across crashes"},
+      {"letter": "C", "text": "Version-control the conversation history file and restore it to resume from the last commit"},
+      {"letter": "D", "text": "Use plan mode throughout the session — plan mode automatically preserves analysis state"}
+    ],
+    "correctAnswer": "A",
+    "explanation": "Structured state exports — manifest files written by the coordinator after each milestone (e.g., modules analyzed, dependencies mapped, findings so far) — enable crash recovery by giving the restarted coordinator a complete picture of what was done. The coordinator loads the manifest on startup and continues from the checkpoint. /memory is for configuration context, not analysis state persistence."
+  },
+  {
+    "id": "d5-017",
+    "domain": 5,
+    "domainName": "Context Management & Reliability",
+    "scenario": "Multi-Agent Codebase Analyzer",
+    "text": "A developer is in a long Claude Code session exploring authentication flows. The context is getting full and responses are becoming less coherent. What command should they use before the context is completely exhausted?",
+    "options": [
+      {"letter": "A", "text": "/compact — reduces context usage during extended exploration sessions by summarizing the conversation"},
+      {"letter": "B", "text": "/memory — loads additional memory files to supplement the degraded context"},
+      {"letter": "C", "text": "/reset — clears the context and starts fresh with preserved CLAUDE.md files"},
+      {"letter": "D", "text": "/export — saves the current context to a file for later restoration"}
+    ],
+    "correctAnswer": "A",
+    "explanation": "/compact is the Claude Code command designed to reduce context usage during extended exploration sessions by compressing the conversation history while preserving key information. Using it before context is fully exhausted allows the session to continue productively. /memory lists loaded memory files (it doesn't add context). /reset and /export are not real Claude Code commands."
+  },
+  {
+    "id": "d5-018",
+    "domain": 5,
+    "domainName": "Context Management & Reliability",
+    "scenario": "Multi-Agent Codebase Analyzer",
+    "text": "Your document extraction system reports 97% overall accuracy across all document types. The operations team is satisfied. However, you want to verify the system is performing well across all document categories, not just on average. What monitoring approach is needed?",
+    "options": [
+      {"letter": "A", "text": "Increase the overall accuracy target to 99.5% to ensure all subcategories perform well"},
+      {"letter": "B", "text": "Review only the extractions flagged as low-confidence by the model, since high-confidence extractions are reliable"},
+      {"letter": "C", "text": "The 97% aggregate is sufficient — if overall performance is high, subcategory performance is unlikely to be problematic"},
+      {"letter": "D", "text": "Stratified random sampling by document type to measure error rates per category — aggregate accuracy can mask poor performance on specific types"}
+    ],
+    "correctAnswer": "D",
+    "explanation": "Aggregate accuracy (97% overall) can mask poor performance on specific document types or fields. A system that performs at 99.9% on common document types but 60% on rare invoice formats has a 97% aggregate but a real production problem. Stratified random sampling by document type reveals these category-specific failure modes. Only reviewing low-confidence extractions misses systematic errors in high-confidence predictions."
+  },
+  {
+    "id": "d5-019",
+    "domain": 5,
+    "domainName": "Context Management & Reliability",
+    "scenario": "Multi-Agent Codebase Analyzer",
+    "text": "Your extraction system has a confidence threshold below which extractions are routed to human review. Currently the threshold is set arbitrarily at 0.7. How should you calibrate this threshold properly?",
+    "options": [
+      {"letter": "A", "text": "Build a labeled validation set, measure error rates at different threshold values, and select the threshold that balances review volume against error rate"},
+      {"letter": "B", "text": "Set the threshold to 0.9 to be conservative — routing more to human review is always safer"},
+      {"letter": "C", "text": "Ask the model to self-report confidence and adjust the threshold based on the model's accuracy on those self-assessed cases"},
+      {"letter": "D", "text": "Keep the threshold at 0.7 since it was validated by the engineering team as a reasonable default"}
+    ],
+    "correctAnswer": "A",
+    "explanation": "Proper threshold calibration requires empirical validation: build a labeled validation set, measure actual error rates at different threshold values, and choose the threshold that achieves the desired balance between human review volume and error rate. Setting 0.9 arbitrarily may route too much to humans without proportional quality gain. Model self-confidence is poorly calibrated and is not a reliable ground truth for threshold tuning."
+  },
+  {
+    "id": "d5-020",
+    "domain": 5,
+    "domainName": "Context Management & Reliability",
+    "scenario": "Multi-Agent Codebase Analyzer",
+    "text": "Your extraction system has been in production for 3 months and initially had high accuracy. You want to ensure it hasn't drifted. What is the most effective ongoing monitoring practice?",
+    "options": [
+      {"letter": "A", "text": "Monitor model API error rates and latency as proxies for output quality degradation"},
+      {"letter": "B", "text": "Stratified random sampling of high-confidence extractions for ongoing error rate measurement to catch systematic drift"},
+      {"letter": "C", "text": "Re-run the original validation set monthly to check if accuracy scores have changed"},
+      {"letter": "D", "text": "Trust that high-confidence predictions are accurate and only manually review extractions flagged as low-confidence"}
+    ],
+    "correctAnswer": "B",
+    "explanation": "Stratified random sampling of high-confidence extractions is the key quality control mechanism for ongoing monitoring. The model doesn't know when it's wrong on high-confidence predictions — systematic errors (e.g., consistently misreading a new document template that emerged post-deployment) will only be caught through independent sampling and review. Re-running original validation sets may not capture new document type distributions."
+  },
+  {
+    "id": "d5-021",
+    "domain": 5,
+    "domainName": "Context Management & Reliability",
+    "scenario": "Multi-Agent Codebase Analyzer",
+    "text": "You're synthesizing a research report from 8 different source documents. Your pipeline produces a summary but loses track of which claims came from which sources. A reviewer asks you to verify a specific statistic. What is the core problem and fix?",
+    "options": [
+      {"letter": "A", "text": "Source attribution is lost during summarization — the pipeline must maintain claim-source mappings throughout synthesis rather than discarding provenance"},
+      {"letter": "B", "text": "The summary is too compressed — increase summary length to retain more quoted text from sources"},
+      {"letter": "C", "text": "Request the sources from the model after the fact — ask it to identify which source each claim likely came from"},
+      {"letter": "D", "text": "Use extractive summarization instead of abstractive summarization to preserve direct quotes"}
+    ],
+    "correctAnswer": "A",
+    "explanation": "Source attribution lost during summarization is a fundamental design flaw — once provenance is discarded, it cannot be reliably reconstructed. The fix is architectural: maintain claim-source mappings throughout the synthesis pipeline so that every claim in the final output can be traced to its originating document. Asking the model to reconstruct attribution after the fact produces unreliable results."
+  },
+  {
+    "id": "d5-022",
+    "domain": 5,
+    "domainName": "Context Management & Reliability",
+    "scenario": "Multi-Agent Codebase Analyzer",
+    "text": "Two credible sources in your research dataset report conflicting statistics: Source A reports a 34% adoption rate, Source B (equally credible) reports 41% adoption for the same metric in the same period. How should your synthesis pipeline handle this?",
+    "options": [
+      {"letter": "A", "text": "Average the two statistics (37.5%) and attribute to both sources"},
+      {"letter": "B", "text": "Use the more conservative figure (34%) to avoid overstating adoption"},
+      {"letter": "C", "text": "Flag the discrepancy and exclude both statistics from the report until they can be reconciled"},
+      {"letter": "D", "text": "Annotate both statistics in the output with their respective sources and note the discrepancy, rather than selecting one arbitrarily"}
+    ],
+    "correctAnswer": "D",
+    "explanation": "When credible sources report conflicting statistics, the correct approach is to annotate both with attribution and note the discrepancy — this preserves the information landscape accurately. Averaging invents a third number neither source reported. Selecting the 'conservative' figure makes an arbitrary editorial judgment. Excluding both discards valid information and creates gaps in the report."
+  },
+  {
+    "id": "d5-023",
+    "domain": 5,
+    "domainName": "Context Management & Reliability",
+    "scenario": "Multi-Agent Codebase Analyzer",
+    "text": "Your synthesis pipeline handles 12 source documents but routinely ignores relevant passages from documents 5-9 in the input sequence while accurately reflecting documents 1-4 and 10-12. Which context management principle explains this and what is the structural fix?",
+    "options": [
+      {"letter": "A", "text": "The 'lost in the middle' effect — restructure inputs so critical content appears at the beginning or end, or use a multi-pass approach processing subsets of documents"},
+      {"letter": "B", "text": "Documents 5-9 are likely lower quality; apply relevance scoring and move high-quality documents to the beginning"},
+      {"letter": "C", "text": "The model has a fixed attention budget that runs out by document 5; upgrade to a model with a larger context window"},
+      {"letter": "D", "text": "The middle documents contain conflicting information that the model is programmed to suppress"}
+    ],
+    "correctAnswer": "A",
+    "explanation": "The 'lost in the middle' effect explains why content from middle positions (documents 5-9 in a 12-document input) receives less attention than beginning and end content. The structural fix is to either reorder inputs to place critical documents at context boundaries, or use a multi-pass approach that processes subsets of documents separately and merges findings — avoiding deep-middle positioning entirely."
+  }
+]

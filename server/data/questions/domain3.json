@@ -1,0 +1,452 @@
+[
+  {
+    "id": "d3-001",
+    "domain": 3,
+    "domainName": "Claude Code Configuration & Workflows",
+    "scenario": "CLAUDE.md Hierarchy Setup",
+    "text": "A developer wants to apply personal coding preferences—such as preferred variable naming conventions—across all projects they work on, without sharing those preferences with teammates. Where should they place their CLAUDE.md configuration?",
+    "options": [
+      {"letter": "A", "text": ".claude/CLAUDE.md at the project root"},
+      {"letter": "B", "text": "~/.claude/CLAUDE.md in their home directory"},
+      {"letter": "C", "text": "CLAUDE.md at the repository root"},
+      {"letter": "D", "text": "A subdirectory CLAUDE.md closest to the files they edit most"}
+    ],
+    "correctAnswer": "B",
+    "explanation": "The user-level CLAUDE.md at ~/.claude/CLAUDE.md applies personal preferences across all projects without being committed to version control. Project-level files (.claude/CLAUDE.md or root CLAUDE.md) are shared via version control and apply to everyone who clones the repo. Subdirectory CLAUDE.md files apply only to that directory tree."
+  },
+  {
+    "id": "d3-002",
+    "domain": 3,
+    "domainName": "Claude Code Configuration & Workflows",
+    "scenario": "CLAUDE.md Hierarchy Setup",
+    "text": "Your team maintains a large CLAUDE.md that has grown unwieldy with hundreds of lines covering testing standards, security policies, and API conventions. A teammate suggests splitting it into separate files. What is the correct Claude Code mechanism to reference these external files from the main CLAUDE.md?",
+    "options": [
+      {"letter": "A", "text": "Use a JSON 'includes' array in a .claude/config.json file to list all rule files"},
+      {"letter": "B", "text": "Use an HTML-style <!-- include --> comment directive in CLAUDE.md"},
+      {"letter": "C", "text": "Use the @import syntax to reference external Markdown files from within CLAUDE.md"},
+      {"letter": "D", "text": "Place additional .md files anywhere in .claude/ and Claude will automatically merge them"}
+    ],
+    "correctAnswer": "C",
+    "explanation": "Claude Code supports the @import syntax inside CLAUDE.md to reference external files modularly. This allows large configurations to be split into focused, maintainable files while being composed together. The other options describe mechanisms that do not exist in Claude Code."
+  },
+  {
+    "id": "d3-003",
+    "domain": 3,
+    "domainName": "Claude Code Configuration & Workflows",
+    "scenario": "CLAUDE.md Hierarchy Setup",
+    "text": "A developer has configured CLAUDE.md files at multiple levels of their project hierarchy and is unsure which memory files are actually being loaded in the current session. What command should they run to verify this?",
+    "options": [
+      {"letter": "A", "text": "/config --show-files"},
+      {"letter": "B", "text": "/debug context"},
+      {"letter": "C", "text": "claude --list-rules"},
+      {"letter": "D", "text": "/memory"}
+    ],
+    "correctAnswer": "D",
+    "explanation": "The /memory command in Claude Code displays which memory files (CLAUDE.md files at all levels) are currently loaded in the session. This is the correct way to verify the active configuration hierarchy."
+  },
+  {
+    "id": "d3-004",
+    "domain": 3,
+    "domainName": "Claude Code Configuration & Workflows",
+    "scenario": "CLAUDE.md Hierarchy Setup",
+    "text": "Your project has a top-level CLAUDE.md with general guidelines. The backend/ subdirectory has unique database migration rules that should only apply when Claude works in that directory. What is the correct approach?",
+    "options": [
+      {"letter": "A", "text": "Add a CLAUDE.md file inside the backend/ directory with the migration-specific rules"},
+      {"letter": "B", "text": "Add a conditional section to the root CLAUDE.md with an 'if directory == backend/' prefix"},
+      {"letter": "C", "text": "Create a .claude/rules/ file that imports the backend rules using @import backend/rules.md"},
+      {"letter": "D", "text": "Add backend-specific rules to the user-level ~/.claude/CLAUDE.md with a path filter"}
+    ],
+    "correctAnswer": "A",
+    "explanation": "Claude Code supports directory-level CLAUDE.md files. A CLAUDE.md placed inside backend/ is loaded when Claude works on files in that directory, applying those rules contextually. Root CLAUDE.md does not support conditional sections, and .claude/rules/ files use glob patterns to match file paths rather than directory context."
+  },
+  {
+    "id": "d3-005",
+    "domain": 3,
+    "domainName": "Claude Code Configuration & Workflows",
+    "scenario": "CLAUDE.md Hierarchy Setup",
+    "text": "Your organization maintains shared coding standards that multiple project repositories should all follow. You want to centralize these standards in one place so updates propagate without editing each project's CLAUDE.md. What is the best approach?",
+    "options": [
+      {"letter": "A", "text": "Store the standards in the user-level ~/.claude/CLAUDE.md on each developer's machine"},
+      {"letter": "B", "text": "Copy and paste the standards block into every project's CLAUDE.md and update them separately"},
+      {"letter": "C", "text": "Create a .claude/standards/ directory and Claude will auto-discover files there"},
+      {"letter": "D", "text": "Host the standards in a shared file and use @import in each project's CLAUDE.md to reference it"}
+    ],
+    "correctAnswer": "D",
+    "explanation": "@import allows CLAUDE.md files to reference external files, enabling a centralized standards file to be imported by multiple project configurations. Changes to the shared file propagate to all importing projects. User-level CLAUDE.md doesn't work across repos for team sharing. Copy-paste creates divergence. .claude/standards/ auto-discovery doesn't exist."
+  },
+  {
+    "id": "d3-006",
+    "domain": 3,
+    "domainName": "Claude Code Configuration & Workflows",
+    "scenario": "CLAUDE.md Hierarchy Setup",
+    "text": "A developer adds a new CLAUDE.md file to a subdirectory but isn't sure whether it overrides or merges with the project-level CLAUDE.md. How does Claude Code handle multiple CLAUDE.md files in a hierarchy?",
+    "options": [
+      {"letter": "A", "text": "The most specific (deepest) CLAUDE.md overrides all parent CLAUDE.md files entirely"},
+      {"letter": "B", "text": "All applicable CLAUDE.md files are loaded and their contents are combined; they don't override each other"},
+      {"letter": "C", "text": "Only the root CLAUDE.md is loaded; subdirectory files are ignored unless explicitly imported"},
+      {"letter": "D", "text": "The user-level CLAUDE.md always takes precedence over all project-level files"}
+    ],
+    "correctAnswer": "B",
+    "explanation": "Claude Code loads all applicable CLAUDE.md files across the hierarchy (user-level, project-level, and subdirectory-level) and combines their contents. There is no override behavior—each file adds its context. This layered approach allows general rules at higher levels and specific rules at lower levels to coexist."
+  },
+  {
+    "id": "d3-canonical-4",
+    "domain": 3,
+    "domainName": "Claude Code Configuration & Workflows",
+    "scenario": "Code Generation with Claude Code",
+    "text": "You want to create a custom /review slash command that runs your team's standard code review checklist. This command should be available to every developer when they clone or pull the repository. Where should you create this command file?",
+    "options": [
+      {"letter": "A", "text": "In the .claude/commands/ directory in the project repository."},
+      {"letter": "B", "text": "In ~/.claude/commands/ in each developer's home directory."},
+      {"letter": "C", "text": "In the CLAUDE.md file at the project root."},
+      {"letter": "D", "text": "In a .claude/config.json file with a commands array."}
+    ],
+    "correctAnswer": "A",
+    "explanation": "Project-scoped custom slash commands should be stored in the .claude/commands/ directory within the repository. These commands are version-controlled and automatically available to all developers when they clone or pull the repo. Option B (~/.claude/commands/) is for personal commands not shared via version control. Option C (CLAUDE.md) is for project instructions and context, not command definitions. Option D describes a configuration mechanism that doesn't exist in Claude Code."
+  },
+  {
+    "id": "d3-008",
+    "domain": 3,
+    "domainName": "Claude Code Configuration & Workflows",
+    "scenario": "Code Generation with Claude Code",
+    "text": "A developer wants a custom /standup slash command that generates a daily standup summary but it should only be available to them personally and should not appear when teammates use the project. Where should this command be placed?",
+    "options": [
+      {"letter": "A", "text": ".claude/commands/ in the project repository"},
+      {"letter": "B", "text": "~/.claude/commands/ in their home directory"},
+      {"letter": "C", "text": "A commands: section in the project's CLAUDE.md"},
+      {"letter": "D", "text": ".claude/skills/ with a personal: true flag in the frontmatter"}
+    ],
+    "correctAnswer": "B",
+    "explanation": "User-scoped custom slash commands belong in ~/.claude/commands/ in the developer's home directory. These are personal and not shared via version control. Project-scoped commands in .claude/commands/ are version-controlled and available to all project contributors."
+  },
+  {
+    "id": "d3-009",
+    "domain": 3,
+    "domainName": "Claude Code Configuration & Workflows",
+    "scenario": "Code Generation with Claude Code",
+    "text": "Your team has a skill defined in .claude/skills/ that performs complex multi-step API documentation generation. You notice that running it leaves a large volume of intermediate output in the main conversation, polluting the context for subsequent tasks. What skill frontmatter setting addresses this?",
+    "options": [
+      {"letter": "A", "text": "Set output: suppress in the SKILL.md frontmatter to hide skill output from the main conversation"},
+      {"letter": "B", "text": "Add a cleanup: true field to the SKILL.md frontmatter to remove intermediate steps after completion"},
+      {"letter": "C", "text": "Set context: fork in the skill's SKILL.md frontmatter to run the skill in an isolated sub-agent context"},
+      {"letter": "D", "text": "Use the /compact command after running the skill to compress the accumulated context"}
+    ],
+    "correctAnswer": "C",
+    "explanation": "The context: fork setting in a skill's SKILL.md frontmatter runs the skill in an isolated sub-agent context. The skill executes independently and returns only its final output to the main conversation, preventing intermediate steps and verbose output from polluting the main context. The other options describe features that don't exist or solve a different problem."
+  },
+  {
+    "id": "d3-010",
+    "domain": 3,
+    "domainName": "Claude Code Configuration & Workflows",
+    "scenario": "Code Generation with Claude Code",
+    "text": "You're designing a skill for generating boilerplate React components. The skill should accept a component name as an argument. Where is this argument hint configured?",
+    "options": [
+      {"letter": "A", "text": "In the argument-hint field of the skill's SKILL.md frontmatter"},
+      {"letter": "B", "text": "In the first line of the skill's prompt file as a comment: # Args: <component-name>"},
+      {"letter": "C", "text": "In the project CLAUDE.md under a skills-arguments section"},
+      {"letter": "D", "text": "In a .claude/skills/config.json file mapping skill names to their argument schemas"}
+    ],
+    "correctAnswer": "A",
+    "explanation": "The argument-hint field in a skill's SKILL.md frontmatter describes the expected argument for the skill. This hint is displayed to the user when they invoke the skill, guiding them on what to provide. The other options describe mechanisms that don't exist in Claude Code's skill configuration."
+  },
+  {
+    "id": "d3-011",
+    "domain": 3,
+    "domainName": "Claude Code Configuration & Workflows",
+    "scenario": "Code Generation with Claude Code",
+    "text": "You have a recurring code formatting task your team needs to run daily. You debate whether to implement it as a skill in .claude/skills/ or add it as always-loaded instructions in CLAUDE.md. Which criterion best guides this decision?",
+    "options": [
+      {"letter": "A", "text": "CLAUDE.md is better because it has higher priority than skill files in Claude Code's configuration hierarchy"},
+      {"letter": "B", "text": "Skills are better because they consume fewer tokens than equivalent CLAUDE.md instructions"},
+      {"letter": "C", "text": "Skills are for on-demand invocation; CLAUDE.md is for universal standards that should always apply"},
+      {"letter": "D", "text": "CLAUDE.md is better for formatting tasks; skills are reserved for code generation tasks only"}
+    ],
+    "correctAnswer": "C",
+    "explanation": "The key distinction is invocation model: skills are invoked on-demand when you need them, while CLAUDE.md instructions are always loaded and applied universally. For a task run at specific times (daily formatting), a skill is appropriate. Standards that should always govern Claude's behavior (e.g., never commit secrets) belong in CLAUDE.md."
+  },
+  {
+    "id": "d3-canonical-5",
+    "domain": 3,
+    "domainName": "Claude Code Configuration & Workflows",
+    "scenario": "Code Generation with Claude Code",
+    "text": "You've been assigned to restructure the team's monolithic application into microservices. This will involve changes across dozens of files and requires decisions about service boundaries and module dependencies. Which approach should you take?",
+    "options": [
+      {"letter": "A", "text": "Enter plan mode to explore the codebase, understand dependencies, and design an implementation approach before making changes."},
+      {"letter": "B", "text": "Start with direct execution and make changes incrementally, letting the implementation reveal the natural service boundaries."},
+      {"letter": "C", "text": "Use direct execution with comprehensive upfront instructions detailing exactly how each service should be structured."},
+      {"letter": "D", "text": "Begin in direct execution mode and only switch to plan mode if you encounter unexpected complexity during implementation."}
+    ],
+    "correctAnswer": "A",
+    "explanation": "Plan mode is designed for complex tasks involving large-scale changes, multiple valid approaches, and architectural decisions — exactly what monolith-to-microservices restructuring requires. Option B risks costly rework when dependencies are discovered late. Option C assumes you already know the right structure without exploring the code. Option D ignores that the complexity is already stated in the requirements, not something that might emerge later."
+  },
+  {
+    "id": "d3-013",
+    "domain": 3,
+    "domainName": "Claude Code Configuration & Workflows",
+    "scenario": "Code Generation with Claude Code",
+    "text": "A developer asks Claude to fix a single, well-scoped typo in a configuration variable name that appears in exactly one file. Which execution mode is appropriate?",
+    "options": [
+      {"letter": "A", "text": "Plan mode — all code changes should be planned before execution to ensure safety"},
+      {"letter": "B", "text": "Direct execution — the task is simple, well-scoped, and affects a single file"},
+      {"letter": "C", "text": "Plan mode — any change to configuration requires architectural review"},
+      {"letter": "D", "text": "Direct execution, but only after running /memory to ensure no conflicting conventions"}
+    ],
+    "correctAnswer": "B",
+    "explanation": "Direct execution is appropriate for simple, well-scoped, single-file changes with clear scope. A typo fix in one configuration file meets all these criteria. Plan mode is reserved for complex tasks, large-scale changes, architectural decisions, and multi-file modifications — not every change requires it."
+  },
+  {
+    "id": "d3-014",
+    "domain": 3,
+    "domainName": "Claude Code Configuration & Workflows",
+    "scenario": "Code Generation with Claude Code",
+    "text": "You're using plan mode to design a database schema migration. After Claude proposes the plan, you realize one aspect needs a different approach. What is the key advantage of plan mode at this point?",
+    "options": [
+      {"letter": "A", "text": "Plan mode automatically creates a git branch for the changes so you can review a diff before merging"},
+      {"letter": "B", "text": "Claude runs all planned changes in a sandbox environment and shows you test results before applying them"},
+      {"letter": "C", "text": "You can approve individual steps of the plan while Claude executes others in parallel"},
+      {"letter": "D", "text": "You can safely refine the approach before any changes are committed, exploring alternatives without side effects"}
+    ],
+    "correctAnswer": "D",
+    "explanation": "Plan mode enables safe exploration before committing — you can review, refine, and course-correct the approach without any actual changes having been made. This is its primary value for complex tasks. Claude Code does not automatically create git branches, run sandboxed executions, or parallelize plan steps."
+  },
+  {
+    "id": "d3-015",
+    "domain": 3,
+    "domainName": "Claude Code Configuration & Workflows",
+    "scenario": "Code Generation with Claude Code",
+    "text": "While exploring a large codebase in plan mode, Claude generates extensive discovery output from reading dozens of files and mapping dependencies. You're concerned this verbose output is consuming the conversation context. What should you use?",
+    "options": [
+      {"letter": "A", "text": "An explore subagent that isolates the discovery output and returns only a summary to the main context"},
+      {"letter": "B", "text": "The /compact command to compress the accumulated discovery output before proceeding"},
+      {"letter": "C", "text": "Plan mode's built-in context trimming, which automatically summarizes tool results"},
+      {"letter": "D", "text": "Split the exploration into multiple separate Claude sessions and manually consolidate the findings"}
+    ],
+    "correctAnswer": "A",
+    "explanation": "The explore subagent pattern isolates verbose discovery output from the main conversation. The subagent performs the exploration independently and returns only a concise summary to the main context, preserving valuable context budget. /compact can help in some scenarios but is a blunt instrument; the explore subagent is the specifically designed solution for this pattern."
+  },
+  {
+    "id": "d3-016",
+    "domain": 3,
+    "domainName": "Claude Code Configuration & Workflows",
+    "scenario": "Code Generation with Claude Code",
+    "text": "You need to add a new authentication middleware that touches the auth module, the API routes, and the session management service. Which mode should you choose and why?",
+    "options": [
+      {"letter": "A", "text": "Direct execution — adding middleware is a routine task with an established pattern"},
+      {"letter": "B", "text": "Plan mode — the task involves multiple files and architectural dependencies that should be understood before making changes"},
+      {"letter": "C", "text": "Direct execution — the task is clearly specified so no planning is needed"},
+      {"letter": "D", "text": "Plan mode — any task touching more than one file requires mandatory planning"}
+    ],
+    "correctAnswer": "B",
+    "explanation": "Multi-file modifications involving architectural integration (auth middleware touching auth module, API routes, and session service) are exactly the scenario where plan mode adds value. Understanding the interactions between these systems before making changes prevents errors. Option D is overly prescriptive — plan mode is appropriate based on complexity, not a strict file count rule."
+  },
+  {
+    "id": "d3-017",
+    "domain": 3,
+    "domainName": "Claude Code Configuration & Workflows",
+    "scenario": "Code Generation with Claude Code",
+    "text": "When plan mode is most valuable, it shares a common property with which other Claude Code feature?",
+    "options": [
+      {"letter": "A", "text": "The explore subagent, which also runs tasks in isolation before returning results"},
+      {"letter": "B", "text": "The @import directive, which also separates content organization from content execution"},
+      {"letter": "C", "text": "The /memory command, which also helps verify state before making changes"},
+      {"letter": "D", "text": "The context: fork skill setting, which also prevents changes from affecting the current state"}
+    ],
+    "correctAnswer": "D",
+    "explanation": "Both plan mode and context: fork share the property of enabling safe exploration before committing — plan mode lets you explore approaches without executing changes, and context: fork runs a skill in an isolated sub-agent so its output doesn't pollute the main conversation state. Both provide isolation/preview before commitment."
+  },
+  {
+    "id": "d3-018",
+    "domain": 3,
+    "domainName": "Claude Code Configuration & Workflows",
+    "scenario": "Code Generation with Claude Code",
+    "text": "You're generating a new API endpoint. Your initial prose description of the expected request/response format produces inconsistent outputs — sometimes Claude includes validation, sometimes it doesn't, and the JSON shapes differ between generations. What is the most effective technique to get consistent output?",
+    "options": [
+      {"letter": "A", "text": "Switch to plan mode so Claude can ask clarifying questions before generating"},
+      {"letter": "B", "text": "Add 'be precise and consistent' to the CLAUDE.md instructions"},
+      {"letter": "C", "text": "Provide concrete input/output examples of the exact request and response shapes you expect"},
+      {"letter": "D", "text": "Run the prompt multiple times and manually select the best output"}
+    ],
+    "correctAnswer": "C",
+    "explanation": "Concrete input/output examples are the most effective technique when prose descriptions produce inconsistent results. Examples show Claude exactly what you mean by demonstrating the desired format, reducing ambiguity. Vague directives like 'be precise' in CLAUDE.md don't resolve format uncertainty. Plan mode adds overhead without addressing the root cause."
+  },
+  {
+    "id": "d3-019",
+    "domain": 3,
+    "domainName": "Claude Code Configuration & Workflows",
+    "scenario": "Code Generation with Claude Code",
+    "text": "You want Claude to implement a new data processing function and you know the expected behavior well. Which iterative refinement approach reduces the most back-and-forth while producing the most reliable implementation?",
+    "options": [
+      {"letter": "A", "text": "Write the tests first that define the expected behavior, then have Claude implement the function and iterate using test failures"},
+      {"letter": "B", "text": "Describe the function in detail and ask Claude to implement it, then manually review and request corrections"},
+      {"letter": "C", "text": "Ask Claude to generate three different implementations and select the best one"},
+      {"letter": "D", "text": "Use plan mode to get Claude's implementation proposal, then switch to direct execution"}
+    ],
+    "correctAnswer": "A",
+    "explanation": "Test-driven iteration — writing tests first and sharing test failures with Claude — provides machine-verifiable feedback that precisely identifies what's wrong. This is more reliable than manual review (which misses edge cases) and more efficient than generating multiple implementations or using plan mode when the requirements are already clear."
+  },
+  {
+    "id": "d3-020",
+    "domain": 3,
+    "domainName": "Claude Code Configuration & Workflows",
+    "scenario": "Code Generation with Claude Code",
+    "text": "You're building a complex new feature but you're not entirely sure about all the requirements and edge cases. Before Claude starts implementing, you want to surface unknowns. What iterative refinement pattern is most effective here?",
+    "options": [
+      {"letter": "A", "text": "Write a detailed requirements document and pass it as context before prompting"},
+      {"letter": "B", "text": "Use the interview pattern: ask Claude to ask you clarifying questions before implementing"},
+      {"letter": "C", "text": "Start implementation immediately and use Claude's questions during implementation to refine"},
+      {"letter": "D", "text": "Provide a minimal prompt and iterate on the output until it matches what you intended"}
+    ],
+    "correctAnswer": "B",
+    "explanation": "The interview pattern — having Claude ask clarifying questions before implementing — proactively surfaces requirements gaps and ambiguities before work begins. This avoids costly rework from missed requirements. Writing a requirements document is useful but doesn't guarantee all edge cases are surfaced. Starting implementation immediately with unclear requirements is inefficient."
+  },
+  {
+    "id": "d3-021",
+    "domain": 3,
+    "domainName": "Claude Code Configuration & Workflows",
+    "scenario": "Code Generation with Claude Code",
+    "text": "You identify two separate bugs in your codebase. Bug A causes incorrect tax calculations. Bug B causes a UI misalignment in the checkout flow. They exist in completely different modules with no shared code. How should you approach fixing these?",
+    "options": [
+      {"letter": "A", "text": "Fix them in separate, sequential iterations — address Bug A fully, then address Bug B"},
+      {"letter": "B", "text": "Report both bugs in a single message so Claude can fix them together"},
+      {"letter": "C", "text": "Always use plan mode for multiple bug fixes regardless of their relationship"},
+      {"letter": "D", "text": "Combine them only if they're in the same language or framework"}
+    ],
+    "correctAnswer": "A",
+    "explanation": "Independent issues should be addressed through sequential iteration — one at a time — to keep each change focused, reviewable, and easier to debug if something goes wrong. The guideline is: multiple interacting issues → single message; independent issues → sequential iteration. These bugs are completely independent, so sequential is correct."
+  },
+  {
+    "id": "d3-022",
+    "domain": 3,
+    "domainName": "Claude Code Configuration & Workflows",
+    "scenario": "Code Generation with Claude Code",
+    "text": "A bug causes incorrect behavior only when three specific conditions occur simultaneously: a null user session, an expired token, and a POST request body with a specific field. How should you report this to Claude for fixing?",
+    "options": [
+      {"letter": "A", "text": "Describe all three conditions in a single message, since they interact to produce the bug"},
+      {"letter": "B", "text": "Report each condition separately and let Claude identify how they combine"},
+      {"letter": "C", "text": "First ask Claude to fix the null session issue, then report the token issue, then the request body issue"},
+      {"letter": "D", "text": "Use plan mode to have Claude map the interactions before attempting a fix"}
+    ],
+    "correctAnswer": "A",
+    "explanation": "When multiple conditions interact to produce a bug, report all of them in a single message. Splitting interacting conditions across messages means Claude lacks the full context needed to understand the root cause. The guideline is: multiple interacting issues → single message; independent issues → sequential iteration."
+  },
+  {
+    "id": "d3-canonical-6",
+    "domain": 3,
+    "domainName": "Claude Code Configuration & Workflows",
+    "scenario": "Code Generation with Claude Code",
+    "text": "Your codebase has distinct areas with different coding conventions. Test files are spread throughout the codebase alongside the code they test (e.g., Button.test.tsx next to Button.tsx), and you want all tests to follow the same conventions regardless of location. What's the most maintainable way to ensure Claude automatically applies the correct conventions when generating code?",
+    "options": [
+      {"letter": "A", "text": "Create rule files in .claude/rules/ with YAML frontmatter specifying glob patterns to conditionally apply conventions based on file paths."},
+      {"letter": "B", "text": "Consolidate all conventions in the root CLAUDE.md file under headers for each area, relying on Claude to infer which section applies."},
+      {"letter": "C", "text": "Create skills in .claude/skills/ for each code type that include the relevant conventions in their SKILL.md files."},
+      {"letter": "D", "text": "Place a separate CLAUDE.md file in each subdirectory containing that area's specific conventions."}
+    ],
+    "correctAnswer": "A",
+    "explanation": ".claude/rules/ with glob patterns (e.g., **/*.test.tsx) allows conventions to be automatically applied based on file paths regardless of directory location — essential for test files spread throughout the codebase. Option B relies on inference rather than explicit matching, making it unreliable. Option C requires manual skill invocation. Option D cannot easily handle files spread across many directories since CLAUDE.md files are directory-bound."
+  },
+  {
+    "id": "d3-024",
+    "domain": 3,
+    "domainName": "Claude Code Configuration & Workflows",
+    "scenario": "Code Generation with Claude Code",
+    "text": "Your project has test files (*.test.ts), migration files (db/migrations/*.sql), and config files (config/*.yaml) that each require different conventions. What is the correct way to configure these rules using .claude/rules/?",
+    "options": [
+      {"letter": "A", "text": "Create a single .claude/rules/all-rules.md file and use regex comments to mark which sections apply to which file types"},
+      {"letter": "B", "text": "Create separate rule files in .claude/rules/ each with a YAML frontmatter paths field containing the appropriate glob pattern for each file type"},
+      {"letter": "C", "text": "Create subdirectories within .claude/rules/ matching the directory structure of the codebase"},
+      {"letter": "D", "text": "Add a rules: array in .claude/config.json mapping glob patterns to rule file names"}
+    ],
+    "correctAnswer": "B",
+    "explanation": "Each rule file in .claude/rules/ has a YAML frontmatter paths field containing glob patterns. Multiple separate rule files can each target different glob patterns — one for *.test.ts, one for db/migrations/*.sql, etc. Rules load only when editing matching files, reducing irrelevant context. The other options describe mechanisms that don't exist."
+  },
+  {
+    "id": "d3-025",
+    "domain": 3,
+    "domainName": "Claude Code Configuration & Workflows",
+    "scenario": "Code Generation with Claude Code",
+    "text": "What is the primary benefit of loading rules only when editing matching files in .claude/rules/, compared to putting all rules in a monolithic CLAUDE.md?",
+    "options": [
+      {"letter": "A", "text": "It reduces irrelevant context and token usage by loading only rules pertinent to the current file"},
+      {"letter": "B", "text": "It improves rule priority — .claude/rules/ files always override CLAUDE.md instructions"},
+      {"letter": "C", "text": "It enables rules to be encrypted so they're not visible to all team members"},
+      {"letter": "D", "text": "It allows rules to be applied retroactively to existing files in the codebase"}
+    ],
+    "correctAnswer": "A",
+    "explanation": "Path-specific rules in .claude/rules/ load only when editing files matching the configured glob patterns. This reduces irrelevant context and token usage — a developer editing a React component doesn't need database migration rules loaded. A monolithic CLAUDE.md loads all rules always, consuming context budget regardless of relevance."
+  },
+  {
+    "id": "d3-026",
+    "domain": 3,
+    "domainName": "Claude Code Configuration & Workflows",
+    "scenario": "Code Generation with Claude Code",
+    "text": "Your project has subdirectories for frontend/, backend/, and shared/. Test files exist in all three directories. You want a single set of test conventions to apply to all *.test.ts files regardless of their parent directory. What is the advantage of .claude/rules/ over subdirectory CLAUDE.md files for this use case?",
+    "options": [
+      {"letter": "A", "text": ".claude/rules/ supports TypeScript glob syntax while CLAUDE.md only supports basic wildcard patterns"},
+      {"letter": "B", "text": ".claude/rules/ files have higher priority than subdirectory CLAUDE.md files, ensuring consistent behavior"},
+      {"letter": "C", "text": "A single .claude/rules/ file with paths: ['**/*.test.ts'] covers all test files across all directories without duplication"},
+      {"letter": "D", "text": ".claude/rules/ files are cached more efficiently, reducing load time in large codebases"}
+    ],
+    "correctAnswer": "C",
+    "explanation": "Glob-pattern rules in .claude/rules/ beat directory-level CLAUDE.md for conventions that span multiple directories. A single rule with paths: ['**/*.test.ts'] matches all test files everywhere in the codebase. The alternative — placing CLAUDE.md in frontend/, backend/, and shared/ — requires duplication and synchronized maintenance."
+  },
+  {
+    "id": "d3-027",
+    "domain": 3,
+    "domainName": "Claude Code Configuration & Workflows",
+    "scenario": "Claude Code for Continuous Integration",
+    "text": "Your CI job uses the command: claude \"Generate unit tests for the new UserService class\" but sometimes the job fails with a timeout because Claude is waiting for user input. What is the root cause and fix?",
+    "options": [
+      {"letter": "A", "text": "Claude Code is in interactive mode by default; add the -p flag to run in non-interactive mode"},
+      {"letter": "B", "text": "The CI environment lacks ANTHROPIC_API_KEY; set the environment variable to enable headless operation"},
+      {"letter": "C", "text": "Claude Code requires a TTY; add the --no-tty flag to suppress the interactive terminal requirement"},
+      {"letter": "D", "text": "The prompt is too long for CI mode; use a shorter prompt or reference a prompt file with @file"}
+    ],
+    "correctAnswer": "A",
+    "explanation": "Claude Code runs in interactive mode by default, prompting for input when needed. In CI pipelines without a terminal, this causes indefinite hangs. The -p (--print) flag switches to non-interactive mode: it processes the prompt, outputs the result to stdout, and exits. There is no --no-tty flag or prompt length limit causing this issue."
+  },
+  {
+    "id": "d3-028",
+    "domain": 3,
+    "domainName": "Claude Code Configuration & Workflows",
+    "scenario": "Claude Code for Continuous Integration",
+    "text": "You want your CI pipeline to parse Claude Code's output programmatically and extract structured findings. Which Claude Code flags should you use?",
+    "options": [
+      {"letter": "A", "text": "--format structured and --schema-file to reference a schema definition"},
+      {"letter": "B", "text": "--output-format json combined with --json-schema to produce machine-parseable structured output"},
+      {"letter": "C", "text": "--output json and --validate-schema to produce and validate JSON output"},
+      {"letter": "D", "text": "--mode batch and --output-type json for batch-mode structured responses"}
+    ],
+    "correctAnswer": "B",
+    "explanation": "The --output-format json flag combined with --json-schema produces machine-parseable structured output that CI pipelines can parse programmatically. The other options describe flag combinations that don't exist in Claude Code's CLI."
+  },
+  {
+    "id": "d3-029",
+    "domain": 3,
+    "domainName": "Claude Code Configuration & Workflows",
+    "scenario": "Claude Code for Continuous Integration",
+    "text": "Your CI pipeline invokes Claude Code to run tests and verify code quality, but Claude seems unaware of your project's testing framework, fixture locations, and coding standards each time it runs. What is the most appropriate solution?",
+    "options": [
+      {"letter": "A", "text": "Add a CLAUDE.md file to the project that documents testing standards, fixture paths, and conventions — Claude Code loads this automatically"},
+      {"letter": "B", "text": "Pass the testing standards as a long --context flag argument each time the CI command runs"},
+      {"letter": "C", "text": "Create a CI-specific wrapper script that prepends context to every Claude Code invocation"},
+      {"letter": "D", "text": "Use the --memory flag to point Claude Code to a shared memory file stored in the CI artifact store"}
+    ],
+    "correctAnswer": "A",
+    "explanation": "CLAUDE.md is the standard mechanism for providing project context — including testing standards, fixture locations, and coding conventions — to Claude Code. It's version-controlled, automatically loaded when Claude Code runs in the project, and available to all invocations including CI. Passing context as flags on every invocation is fragile and error-prone."
+  },
+  {
+    "id": "d3-canonical-10",
+    "domain": 3,
+    "domainName": "Claude Code Configuration & Workflows",
+    "scenario": "Claude Code for Continuous Integration",
+    "text": "Your pipeline script runs claude \"Analyze this pull request for security issues\" but the job hangs indefinitely. Logs indicate Claude Code is waiting for interactive input. What's the correct approach to run Claude Code in an automated pipeline?",
+    "options": [
+      {"letter": "A", "text": "Add the -p flag: claude -p \"Analyze this pull request for security issues\"."},
+      {"letter": "B", "text": "Set the environment variable CLAUDE_HEADLESS=true before running the command."},
+      {"letter": "C", "text": "Redirect stdin from /dev/null: claude \"Analyze this pull request for security issues\" < /dev/null."},
+      {"letter": "D", "text": "Add the --batch flag: claude --batch \"Analyze this pull request for security issues\"."}
+    ],
+    "correctAnswer": "A",
+    "explanation": "The -p (or --print) flag is the documented way to run Claude Code in non-interactive mode. It processes the prompt, outputs the result to stdout, and exits without waiting for user input — exactly what CI/CD pipelines require. The other options reference non-existent features (CLAUDE_HEADLESS environment variable, --batch flag) or use Unix workarounds that don't properly address Claude Code's command syntax."
+  }
+]
