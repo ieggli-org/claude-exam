@@ -1,22 +1,29 @@
 import { Router } from 'express';
-import { readFileSync, writeFileSync } from 'fs';
+import { readFileSync, writeFileSync, existsSync } from 'fs';
 import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
 import { v4 as uuidv4 } from 'uuid';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const resultsFile = join(__dirname, '..', 'data', 'results.json');
+
+function getResultsFile() {
+  if (process.env.VERCEL) {
+    if (!existsSync('/tmp/results.json')) writeFileSync('/tmp/results.json', '[]', 'utf8');
+    return '/tmp/results.json';
+  }
+  return join(__dirname, '..', 'data', 'results.json');
+}
 
 function readResults() {
   try {
-    return JSON.parse(readFileSync(resultsFile, 'utf8'));
+    return JSON.parse(readFileSync(getResultsFile(), 'utf8'));
   } catch {
     return [];
   }
 }
 
 function writeResults(results) {
-  writeFileSync(resultsFile, JSON.stringify(results, null, 2), 'utf8');
+  writeFileSync(getResultsFile(), JSON.stringify(results, null, 2), 'utf8');
 }
 
 const router = Router();
