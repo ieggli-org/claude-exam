@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { SpeedInsights } from '@vercel/speed-insights/react';
 import StartScreen from './pages/StartScreen.jsx';
 import QuizScreen from './pages/QuizScreen.jsx';
 import ResultsScreen from './pages/ResultsScreen.jsx';
@@ -53,6 +54,7 @@ export default function App() {
           <HistoryScreen onBack={retake} />
         )}
       </main>
+      <SpeedInsights />
     </div>
   );
 }
